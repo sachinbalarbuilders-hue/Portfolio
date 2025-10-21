@@ -62,8 +62,28 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.08 });
 revealEls.forEach(el => revealObserver.observe(el));
 
+// Ensure about section content is visible when navigated to
+function ensureAboutContentVisible() {
+  const aboutSection = document.getElementById('about');
+  if (aboutSection) {
+    const aboutRevealElements = aboutSection.querySelectorAll('.reveal-up');
+    aboutRevealElements.forEach(el => {
+      el.classList.add('in-view');
+    });
+  }
+}
+
+// Listen for navigation clicks to about section
+document.addEventListener('click', (e) => {
+  if (e.target.matches('a[href="#about"]') || e.target.closest('a[href="#about"]')) {
+    // Small delay to ensure smooth scroll completes
+    setTimeout(ensureAboutContentVisible, 100);
+  }
+});
+
 // About skill bars animate when visible
 let skillBarsAnimated = false;
+let scrollTimeout = null;
 
 function animateSkillBars() {
   const skillBars = document.querySelectorAll('.bar span');
@@ -87,19 +107,30 @@ function resetSkillBars() {
   skillBarsAnimated = false;
 }
 
-// Scroll listener for skills animation
-window.addEventListener('scroll', () => {
+// Debounced scroll listener for skills animation
+function handleSkillsScroll() {
   const aboutSection = document.getElementById('about');
-  if (aboutSection) {
-    const rect = aboutSection.getBoundingClientRect();
-    const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2;
-    
-    if (isInView && !skillBarsAnimated) {
-      animateSkillBars();
-    } else if (!isInView && skillBarsAnimated) {
-      resetSkillBars();
-    }
+  if (!aboutSection) return;
+  
+  const rect = aboutSection.getBoundingClientRect();
+  const viewportHeight = window.innerHeight;
+  
+  // More mobile-friendly viewport detection
+  const isInView = rect.top < viewportHeight * 0.7 && rect.bottom > viewportHeight * 0.3;
+  
+  if (isInView && !skillBarsAnimated) {
+    animateSkillBars();
+  } else if (!isInView && skillBarsAnimated) {
+    resetSkillBars();
   }
+}
+
+// Debounced scroll handler
+window.addEventListener('scroll', () => {
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+  }
+  scrollTimeout = setTimeout(handleSkillsScroll, 16); // ~60fps
 });
 
 // Portfolio modal + hover preview
@@ -228,21 +259,317 @@ carousels.forEach(carousel => {
   carousel.addEventListener('mouseleave', () => { timer = setInterval(() => { index = (index + 1) % slides.length; update(); }, 4500); });
 });
 
-// Contact form basic validation (no backend)
-const contactForm = document.getElementById('contactForm');
-contactForm?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const name = /** @type {HTMLInputElement} */(document.getElementById('name'))?.value.trim();
-  const email = /** @type {HTMLInputElement} */(document.getElementById('email'))?.value.trim();
-  const message = /** @type {HTMLTextAreaElement} */(document.getElementById('message'))?.value.trim();
-  if (!name || !email || !message) {
-    alert('Please fill out all fields.');
-    return;
+// Contact form is now handled by handleContactForm() function
+
+// Typewriter Animation - Optimized
+function initTypewriter() {
+  const typewriterElements = document.querySelectorAll('.typewriter-text');
+  
+  typewriterElements.forEach((element, index) => {
+    const text = element.getAttribute('data-text');
+    element.textContent = '';
+    
+    // Stagger the animation for multiple elements
+    setTimeout(() => {
+      typeText(element, text, 0);
+    }, index * 800); // Reduced delay for faster animation
+  });
+}
+
+function typeText(element, text, index) {
+  if (index < text.length) {
+    element.textContent += text.charAt(index);
+    setTimeout(() => typeText(element, text, index + 1), 50); // Faster typing speed
+  } else {
+    element.classList.add('typing-complete');
   }
-  const emailOk = /.+@.+\..+/.test(email);
-  if (!emailOk) { alert('Please enter a valid email.'); return; }
-  alert('Thanks! Your message has been noted.');
-  contactForm.reset();
+}
+
+// Services scroll animation
+function initServicesAnimation() {
+  const serviceCards = document.querySelectorAll('.service-card');
+  
+  const servicesObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Reset animation state
+        entry.target.classList.remove('animate');
+        
+        // Force reflow to ensure reset is applied
+        entry.target.offsetHeight;
+        
+        // Add a small delay to make it feel more natural
+        setTimeout(() => {
+          entry.target.classList.add('animate');
+        }, 100);
+      } else {
+        // Reset when leaving viewport
+        entry.target.classList.remove('animate');
+      }
+    });
+  }, {
+    threshold: 0.2,
+    rootMargin: '0px 0px -100px 0px'
+  });
+
+  serviceCards.forEach(card => {
+    servicesObserver.observe(card);
+  });
+}
+
+// Stats animation
+function initStatsAnimation() {
+  const statNumbers = document.querySelectorAll('.stat-number');
+  const statLabels = document.querySelectorAll('.stat-label');
+  
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Animate numbers first
+        setTimeout(() => {
+          entry.target.classList.add('animate');
+        }, 100);
+      } else {
+        // Reset animation when scrolling out
+        entry.target.classList.remove('animate');
+      }
+    });
+  }, {
+    threshold: 0.3,
+    rootMargin: '0px 0px -100px 0px'
+  });
+
+  // Observe both numbers and labels
+  statNumbers.forEach(stat => {
+    statsObserver.observe(stat);
+  });
+  
+  statLabels.forEach(label => {
+    statsObserver.observe(label);
+  });
+}
+
+// Contact form submission with validation
+function handleContactForm() {
+  const contactForm = document.getElementById('contactForm');
+  if (!contactForm) return;
+
+  // Add real-time validation
+  const nameInput = document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
+  const messageInput = document.getElementById('message');
+
+  // Name validation
+  nameInput.addEventListener('blur', () => {
+    const name = nameInput.value.trim();
+    if (name.length === 0) {
+      nameInput.setCustomValidity('Name is required');
+      nameInput.reportValidity();
+    } else if (name.length > 30) {
+      nameInput.setCustomValidity('Name must be maximum 30 characters long');
+      nameInput.reportValidity();
+    } else {
+      nameInput.setCustomValidity('');
+    }
+  });
+
+  // Phone validation
+  phoneInput.addEventListener('blur', () => {
+    const phone = phoneInput.value.trim();
+    if (phone.length === 0) {
+      phoneInput.setCustomValidity('Phone number is required');
+      phoneInput.reportValidity();
+    } else {
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(phone)) {
+        phoneInput.setCustomValidity('Please enter a valid 10-digit phone number');
+        phoneInput.reportValidity();
+      } else {
+        phoneInput.setCustomValidity('');
+      }
+    }
+  });
+
+  // Email validation
+  const emailInput = document.getElementById('email');
+  emailInput.addEventListener('blur', () => {
+    const email = emailInput.value.trim();
+    if (email.length > 20) {
+      emailInput.setCustomValidity('Email must be maximum 20 characters long');
+      emailInput.reportValidity();
+    } else {
+      emailInput.setCustomValidity('');
+    }
+  });
+
+  // Message validation
+  messageInput.addEventListener('blur', () => {
+    const message = messageInput.value.trim();
+    if (message.length === 0) {
+      messageInput.setCustomValidity('Message is required');
+      messageInput.reportValidity();
+    } else {
+      messageInput.setCustomValidity('');
+    }
+  });
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Validate all required fields
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const message = messageInput.value.trim();
+    
+    let isValid = true;
+    
+    // Check name - required but no minimum length
+    if (name.length === 0) {
+      nameInput.setCustomValidity('Name is required');
+      nameInput.reportValidity();
+      isValid = false;
+    } else if (name.length > 30) {
+      nameInput.setCustomValidity('Name must be maximum 30 characters long');
+      nameInput.reportValidity();
+      isValid = false;
+    }
+    
+    // Check email
+    if (email.length > 20) {
+      emailInput.setCustomValidity('Email must be maximum 20 characters long');
+      emailInput.reportValidity();
+      isValid = false;
+    }
+    
+    // Check phone - required and must be 10 digits
+    if (phone.length === 0) {
+      phoneInput.setCustomValidity('Phone number is required');
+      phoneInput.reportValidity();
+      isValid = false;
+    } else {
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(phone)) {
+        phoneInput.setCustomValidity('Please enter a valid 10-digit phone number');
+        phoneInput.reportValidity();
+        isValid = false;
+      }
+    }
+    
+    // Check message - required but no minimum length
+    if (message.length === 0) {
+      messageInput.setCustomValidity('Message is required');
+      messageInput.reportValidity();
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      return; // Stop submission if validation fails
+    }
+    
+    const formData = new FormData(contactForm);
+    const submission = {
+      id: Date.now().toString(),
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      message: formData.get('message'),
+      timestamp: new Date().toISOString(),
+      status: 'new'
+    };
+
+    try {
+      // Save to cloud storage via API
+      const api = new PortfolioAPI();
+      const portfolioData = await api.getData();
+      
+      // Ensure submissions array exists
+      if (!portfolioData.submissions) {
+        portfolioData.submissions = [];
+      }
+      
+      // Add new submission
+      portfolioData.submissions.push(submission);
+      
+      // Save to cloud
+      await api.saveData(portfolioData);
+      
+
+      // Show success message
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '✅ Message Sent!';
+      submitBtn.disabled = true;
+      
+      // Reset form
+      contactForm.reset();
+      
+      // Reset button after 3 seconds
+      setTimeout(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error saving contact submission:', error);
+      alert('There was an error sending your message. Please try again.');
+    }
+  });
+}
+
+// Work slider navigation
+function initWorkSlider() {
+  const workGrid = document.querySelector('.work-grid');
+  const leftBtn = document.querySelector('.work-nav-left');
+  const rightBtn = document.querySelector('.work-nav-right');
+  
+  if (!workGrid || !leftBtn || !rightBtn) return;
+  
+  const scrollAmount = 320; // Scroll by one card width + gap
+  
+  leftBtn.addEventListener('click', () => {
+    workGrid.scrollBy({
+      left: -scrollAmount,
+      behavior: 'smooth'
+    });
+  });
+  
+  rightBtn.addEventListener('click', () => {
+    workGrid.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth'
+    });
+  });
+  
+  // Show/hide arrows based on scroll position
+  function updateArrows() {
+    const scrollLeft = workGrid.scrollLeft;
+    const maxScroll = workGrid.scrollWidth - workGrid.clientWidth;
+    
+    if (scrollLeft > 0) {
+      leftBtn.classList.remove('disabled');
+    } else {
+      leftBtn.classList.add('disabled');
+    }
+    
+    if (scrollLeft < maxScroll - 10) {
+      rightBtn.classList.remove('disabled');
+    } else {
+      rightBtn.classList.add('disabled');
+    }
+  }
+  
+  workGrid.addEventListener('scroll', updateArrows);
+  updateArrows(); // Initial state
+}
+
+// Initialize typewriter animation when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initTypewriter, 300); // Reduced initial delay
+  initServicesAnimation(); // Initialize services animation
+  initStatsAnimation(); // Initialize stats animation
+  handleContactForm(); // Initialize contact form
+  initWorkSlider(); // Initialize work slider navigation
 });
 
 // Cursor-follow glow

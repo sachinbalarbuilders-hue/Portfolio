@@ -1,24 +1,32 @@
 // Admin Panel JavaScript
 class PortfolioAdmin {
     constructor() {
-        this.data = this.loadData();
+        this.api = new PortfolioAPI();
+        this.data = {};
         this.currentEditingId = null;
         this.isAuthenticated = this.checkAuthentication();
         this.adminPassword = 'adminsonu';
-        this.init();
+        this.init().catch(console.error);
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
         
         if (this.isAuthenticated) {
             this.showAdminPanel();
-            this.loadDashboard();
+            await this.loadData();
+            // Ensure submissions array exists
+            if (!this.data.submissions) {
+                this.data.submissions = [];
+            }
+            
+            // Migrate existing localStorage submissions to cloud (one-time migration)
+            await this.migrateLocalSubmissions();
             this.loadVideos();
             this.loadTestimonials();
-            this.loadServices();
             this.loadAbout();
             this.loadContact();
+            this.loadSubmissions();
         } else {
             this.showLoginScreen();
         }
@@ -28,12 +36,17 @@ class PortfolioAdmin {
         // Login form
         document.getElementById('loginForm')?.addEventListener('submit', (e) => this.handleLogin(e));
 
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle')?.addEventListener('click', () => this.toggleMobileMenu());
+
         // Sidebar navigation
         document.querySelectorAll('.sidebar-menu a').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const section = link.getAttribute('data-section');
                 this.switchSection(section);
+                // Close mobile menu when navigating
+                this.closeMobileMenu();
             });
         });
 
@@ -48,6 +61,18 @@ class PortfolioAdmin {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 this.closeModal();
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('adminSidebar');
+            const toggle = document.getElementById('mobileMenuToggle');
+            
+            if (sidebar && sidebar.classList.contains('mobile-open') && 
+                !sidebar.contains(e.target) && 
+                !toggle.contains(e.target)) {
+                this.closeMobileMenu();
             }
         });
     }
@@ -79,7 +104,7 @@ class PortfolioAdmin {
         document.getElementById('adminPanel').style.display = 'flex';
     }
 
-    handleLogin(e) {
+    async handleLogin(e) {
         e.preventDefault();
         const password = document.getElementById('adminPassword').value;
         
@@ -90,12 +115,12 @@ class PortfolioAdmin {
             
             this.isAuthenticated = true;
             this.showAdminPanel();
-            this.loadDashboard();
+            await this.loadData();
             this.loadVideos();
             this.loadTestimonials();
-            this.loadServices();
             this.loadAbout();
             this.loadContact();
+            this.loadSubmissions();
         } else {
             alert('❌ Incorrect password! Please try again.');
             document.getElementById('adminPassword').value = '';
@@ -113,29 +138,46 @@ class PortfolioAdmin {
         }
     }
 
+    // Mobile menu methods
+    toggleMobileMenu() {
+        const sidebar = document.getElementById('adminSidebar');
+        const toggle = document.getElementById('mobileMenuToggle');
+        
+        if (sidebar && toggle) {
+            sidebar.classList.toggle('mobile-open');
+            toggle.classList.toggle('active');
+        }
+    }
+
+    closeMobileMenu() {
+        const sidebar = document.getElementById('adminSidebar');
+        const toggle = document.getElementById('mobileMenuToggle');
+        
+        if (sidebar && toggle) {
+            sidebar.classList.remove('mobile-open');
+            toggle.classList.remove('active');
+        }
+    }
+
     // Data Management
-    loadData() {
-        const saved = localStorage.getItem('portfolioData');
-        return saved ? JSON.parse(saved) : {
+    async loadData() {
+        try {
+            this.data = await this.api.getData();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            // Fallback to empty data structure
+            this.data = {
             videos: [],
             testimonials: [],
             services: [],
-            about: {
-                text: "I'm a passionate video editor with over 3 years of experience crafting reels, cinematic brand promos, and YouTube content. My goal is to tell visual stories that captivate audiences and deliver impact.",
-                image: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1200&auto=format&fit=crop",
-                resume: "resume.pdf"
-            },
-            contact: {
-                email: "sonurawat848484@gmail.com",
-                whatsapp: "#",
-                instagram: "@SK_RAWAT48",
-                youtube: "https://youtube.com/@skvlog4848"
-            }
-        };
+                about: {},
+                contact: {}
+            };
+        }
     }
 
-    saveData() {
-        localStorage.setItem('portfolioData', JSON.stringify(this.data));
+    async saveData() {
+        await this.api.saveData(this.data);
         this.updateMainWebsite();
     }
 
@@ -214,15 +256,121 @@ class PortfolioAdmin {
         document.querySelectorAll('.admin-section').forEach(section => {
             section.classList.remove('active');
         });
-        document.getElementById(sectionName).classList.add('active');
+        const targetSection = document.getElementById(sectionName);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+        
+        // Load submissions when switching to submissions section
+        if (sectionName === 'submissions') {
+            this.loadSubmissions();
+        }
+        
+        // Simple fix for submissions section
+        if (sectionName === 'submissions') {
+            setTimeout(() => {
+                const submissionsSection = document.getElementById('submissions');
+                
+                if (submissionsSection) {
+                    // Make ALL parent containers visible
+                    const adminPanel = document.getElementById('adminPanel');
+                    const adminMain = document.querySelector('.admin-main');
+                    
+                    if (adminPanel) {
+                        adminPanel.style.display = 'flex';
+                        adminPanel.style.visibility = 'visible';
+                        adminPanel.style.opacity = '1';
+                    }
+                    
+                    if (adminMain) {
+                        adminMain.style.display = 'block';
+                        adminMain.style.visibility = 'visible';
+                        adminMain.style.opacity = '1';
+                        adminMain.style.overflow = 'visible';
+                    }
+                    
+                    // Make section visible
+                    submissionsSection.style.display = 'block';
+                    submissionsSection.style.visibility = 'visible';
+                    submissionsSection.style.opacity = '1';
+                    submissionsSection.classList.add('active');
+                    
+                    // Remove any existing test elements
+                    const existingTest = document.querySelector('[style*="background: red"]');
+                    if (existingTest) {
+                        existingTest.remove();
+                    }
+                    
+                    // Get submissions from cloud data
+                    const submissions = this.data.submissions || [];
+                    const submissionsList = document.getElementById('submissionsList');
+                    
+                    if (submissions.length > 0) {
+                    // Create a completely new overlay element to bypass all CSS
+                    const overlay = document.createElement('div');
+                    overlay.id = 'submissionsOverlay';
+                    overlay.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.95) !important; z-index: 99999 !important; overflow: auto !important; padding: 20px !important; display: flex !important; flex-direction: column !important;';
+                    
+                    // Add close button
+                    const closeBtn = document.createElement('button');
+                    closeBtn.textContent = '✕ Close';
+                    closeBtn.style.cssText = 'position: sticky !important; top: 10px !important; right: 10px !important; align-self: flex-end !important; background: #ef4444 !important; color: white !important; border: none !important; padding: 10px 20px !important; border-radius: 6px !important; cursor: pointer !important; font-size: 16px !important; margin-bottom: 20px !important; z-index: 100000 !important;';
+                    closeBtn.onclick = () => {
+                        overlay.remove();
+                        admin.switchSection('videos'); // Go back to videos section
+                    };
+                    
+                    // Add title
+                    const title = document.createElement('h1');
+                    title.textContent = 'Form Submissions (' + submissions.length + ')';
+                    title.style.cssText = 'color: white !important; text-align: center !important; margin: 0 0 30px 0 !important; font-size: 32px !important;';
+                    
+                    // Add submissions
+                    const container = document.createElement('div');
+                    container.style.cssText = 'max-width: 1200px !important; margin: 0 auto !important; width: 100% !important;';
+                    
+                    if (submissions.length > 0) {
+                        container.innerHTML = submissions.map(submission => {
+                            const isRead = submission.status === 'read';
+                            const borderColor = isRead ? '#888' : '#06b6d4';
+                            const statusColor = isRead ? '#888' : '#8b5cf6';
+                            const statusText = isRead ? '✓ Read' : '● New';
+                            
+                            return `
+                            <div style="background: #1a1a1a !important; border: 2px solid ${borderColor} !important; padding: 25px !important; margin: 20px 0 !important; border-radius: 12px !important; opacity: ${isRead ? '0.7' : '1'} !important;">
+                                <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 15px !important;">
+                                    <h3 style="color: #06b6d4 !important; margin: 0 !important; font-size: 24px !important;">${submission.name || 'No name'}</h3>
+                                    <span style="color: ${statusColor} !important; font-size: 14px !important; font-weight: 600 !important; background: rgba(${isRead ? '136,136,136' : '139,92,246'},0.2) !important; padding: 6px 12px !important; border-radius: 6px !important;">${statusText}</span>
+                                </div>
+                                <p style="color: white !important; margin: 10px 0 !important; font-size: 16px !important;"><strong style="color: #888;">Email:</strong> ${submission.email || 'No email'}</p>
+                                <p style="color: white !important; margin: 10px 0 !important; font-size: 16px !important;"><strong style="color: #888;">Phone:</strong> ${submission.phone || 'No phone'}</p>
+                                <p style="color: white !important; margin: 10px 0 !important; font-size: 16px !important;"><strong style="color: #888;">Message:</strong> ${submission.message || 'No message'}</p>
+                                <p style="color: #666 !important; font-size: 14px !important; margin: 20px 0 10px 0 !important;">Submitted: ${new Date(submission.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })} IST</p>
+                                <div style="margin-top: 20px !important; display: flex !important; gap: 15px !important;">
+                                    ${!isRead ? `<button onclick="admin.markAsRead('${submission.id}'); document.getElementById('submissionsOverlay').remove(); admin.switchSection('submissions');" style="background: #06b6d4 !important; color: white !important; border: none !important; padding: 12px 24px !important; border-radius: 8px !important; cursor: pointer !important; font-size: 16px !important; font-weight: 600 !important;">✓ Mark as Read</button>` : `<button disabled style="background: #444 !important; color: #888 !important; border: none !important; padding: 12px 24px !important; border-radius: 8px !important; cursor: not-allowed !important; font-size: 16px !important; font-weight: 600 !important;">✓ Already Read</button>`}
+                                    <button onclick="admin.deleteSubmission('${submission.id}'); document.getElementById('submissionsOverlay').remove(); admin.switchSection('submissions');" style="background: #ef4444 !important; color: white !important; border: none !important; padding: 12px 24px !important; border-radius: 8px !important; cursor: pointer !important; font-size: 16px !important; font-weight: 600 !important;">🗑 Delete</button>
+                                </div>
+                            </div>
+                        `;
+                        }).join('');
+                    } else {
+                        container.innerHTML = '<p style="color: white !important; text-align: center !important; font-size: 20px !important; padding: 50px !important;">No submissions yet</p>';
+                    }
+                    
+                    overlay.appendChild(closeBtn);
+                    overlay.appendChild(title);
+                    overlay.appendChild(container);
+                    document.body.appendChild(overlay);
+                    } else {
+                        alert('No submissions found');
+                    }
+                } else {
+                    console.error('Submissions section not found!');
+                }
+            }, 100);
+        }
     }
 
-    // Dashboard
-    loadDashboard() {
-        document.getElementById('totalVideos').textContent = this.data.videos.length;
-        document.getElementById('totalTestimonials').textContent = this.data.testimonials.length;
-        document.getElementById('totalServices').textContent = this.data.services.length;
-    }
 
     // Videos Management
     loadVideos() {
@@ -234,10 +382,49 @@ class PortfolioAdmin {
             return;
         }
 
-        grid.innerHTML = this.data.videos.map(video => `
+        grid.innerHTML = this.data.videos.map(video => {
+            // Generate thumbnail based on platform
+            let thumbnailSrc = '';
+            let platformIcon = '';
+            
+            if (video.platform === 'instagram') {
+                // Instagram Reel thumbnail - use SVG placeholder like main page
+                thumbnailSrc = `data:image/svg+xml;base64,${btoa(`
+                    <svg width="400" height="225" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f58529;stop-opacity:1" />
+                                <stop offset="25%" style="stop-color:#dd2a7b;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#8134af;stop-opacity:1" />
+                                <stop offset="75%" style="stop-color:#515bd4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#405de6;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#instagram-gradient)"/>
+                        <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Instagram Reel</text>
+                    </svg>
+                `)}`;
+                platformIcon = '📱';
+            } else if (video.platform === 'youtube') {
+                thumbnailSrc = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                platformIcon = '🎥';
+            } else if (video.platform === 'vimeo') {
+                thumbnailSrc = `https://vumbnail.com/${video.id}.jpg`;
+                platformIcon = '🎬';
+            } else if (video.platform === 'googledrive') {
+                thumbnailSrc = `https://drive.google.com/thumbnail?id=${video.id}`;
+                platformIcon = '☁️';
+            } else {
+                // Default thumbnail
+                thumbnailSrc = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                platformIcon = '🎥';
+            }
+            
+            return `
             <div class="content-card">
                 <div class="video-preview">
-                    <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" alt="${video.title}">
+                        <img src="${thumbnailSrc}" alt="${video.title}" onerror="this.src='data:image/svg+xml;base64,${btoa('<svg width="400" height="225" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#333"/><text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-family="Arial" font-size="16">Thumbnail Error</text></svg>')}'">
+                        <div class="platform-badge">${platformIcon} ${video.platform || 'youtube'}</div>
                 </div>
                 <h3>${video.title}</h3>
                 <p>${video.description}</p>
@@ -247,7 +434,8 @@ class PortfolioAdmin {
                     <button class="btn btn-danger" onclick="admin.deleteVideo('${video.id}')">Delete</button>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     addVideo() {
@@ -281,46 +469,93 @@ class PortfolioAdmin {
         document.getElementById('videoModal').classList.add('active');
     }
 
-    deleteVideo(videoId) {
-        console.log('Attempting to delete video with ID:', videoId);
-        console.log('Current videos:', this.data.videos);
-        
-        // Find the video to delete
-        const videoToDelete = this.data.videos.find(v => v.id === videoId);
-        console.log('Video to delete:', videoToDelete);
-        
-        if (!videoToDelete) {
-            console.error('Video not found with ID:', videoId);
-            alert('Video not found!');
-            return;
-        }
-        
-        if (confirm(`Are you sure you want to delete "${videoToDelete.title}"?`)) {
-            // Remove the video using index-based deletion as fallback
-            const videoIndex = this.data.videos.findIndex(v => v.id === videoId);
-            if (videoIndex !== -1) {
-                this.data.videos.splice(videoIndex, 1);
-                console.log('Video deleted using splice method');
-            } else {
-                // Fallback: filter method
-                this.data.videos = this.data.videos.filter(v => v.id !== videoId);
-                console.log('Video deleted using filter method');
-            }
-            
-            console.log('Video deleted. Remaining videos:', this.data.videos.length);
-            
-            this.saveData();
+    async deleteVideo(videoId) {
+        if (confirm('Are you sure you want to delete this video?')) {
+            this.data.videos = this.data.videos.filter(v => v.id !== videoId);
+            await this.saveData();
             this.loadVideos();
-            this.loadDashboard();
-            
-            // Show success message
             alert('Video deleted successfully!');
         }
     }
 
-    handleVideoSubmit(e) {
+    // Extract video ID and platform from URL
+    extractVideoInfo(url) {
+        if (!url) return { platform: 'unknown', id: '', url: '' };
+        
+        // If it's already just an ID (no special characters), assume YouTube
+        if (!url.includes('/') && !url.includes('=') && !url.includes('&') && !url.includes('?')) {
+            return { platform: 'youtube', id: url, url: `https://www.youtube.com/watch?v=${url}` };
+        }
+        
+        // Check for Google Drive
+        if (url.includes('drive.google.com/file/d/')) {
+            const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+            if (match && match[1]) {
+                return { 
+                    platform: 'googledrive', 
+                    type: 'video',
+                    id: match[1], 
+                    url: url 
+                };
+            }
+        }
+        
+        // Check for Vimeo
+        if (url.includes('vimeo.com/')) {
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            if (match && match[1]) {
+                return { 
+                    platform: 'vimeo', 
+                    type: 'video',
+                    id: match[1], 
+                    url: url 
+                };
+            }
+        }
+        
+        // Check for Instagram Reels
+        if (url.includes('instagram.com/reel/')) {
+            const match = url.match(/instagram\.com\/reel\/([^\/\?]+)/);
+            if (match && match[1]) {
+                return { 
+                    platform: 'instagram', 
+                    type: 'reel',
+                    id: match[1], 
+                    url: url 
+                };
+            }
+        }
+        
+        // Check for YouTube URLs
+        const youtubePatterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+            /youtube\.com\/v\/([^&\n?#]+)/,
+            /youtube\.com\/embed\/([^&\n?#]+)/
+        ];
+        
+        for (const pattern of youtubePatterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
+                const videoId = match[1].split('?')[0].split('&')[0];
+                // Check if it's a YouTube Short (only based on URL path)
+                const isShort = url.includes('/shorts/');
+                return { 
+                    platform: 'youtube', 
+                    type: isShort ? 'short' : 'video',
+                    id: videoId, 
+                    url: `https://www.youtube.com/watch?v=${videoId}` 
+                };
+            }
+        }
+        
+        return { platform: 'unknown', id: '', url: url };
+    }
+
+    async handleVideoSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const rawVideoUrl = formData.get('videoId');
+        const videoInfo = this.extractVideoInfo(rawVideoUrl);
         
         if (this.currentEditingId) {
             // Update existing video
@@ -334,7 +569,10 @@ class PortfolioAdmin {
         } else {
             // Add new video
             const videoData = {
-                id: formData.get('videoId'),
+                id: videoInfo.id,
+                platform: videoInfo.platform,
+                type: videoInfo.type || 'video',
+                url: videoInfo.url,
                 title: formData.get('videoTitle'),
                 description: formData.get('videoDescription'),
                 category: formData.get('videoCategory')
@@ -342,9 +580,8 @@ class PortfolioAdmin {
             this.data.videos.push(videoData);
         }
 
-        this.saveData();
+        await this.saveData();
         this.loadVideos();
-        this.loadDashboard();
         this.closeModal();
     }
 
@@ -353,7 +590,7 @@ class PortfolioAdmin {
         const grid = document.getElementById('testimonialsGrid');
         if (!grid) return;
 
-        if (this.data.testimonials.length === 0) {
+        if (!this.data.testimonials || this.data.testimonials.length === 0) {
             grid.innerHTML = '<p style="color: var(--admin-muted); text-align: center; padding: 40px;">No testimonials added yet. Click "Add Testimonial" to get started.</p>';
             return;
         }
@@ -391,16 +628,15 @@ class PortfolioAdmin {
         document.getElementById('testimonialModal').classList.add('active');
     }
 
-    deleteTestimonial(testimonialId) {
+    async deleteTestimonial(testimonialId) {
         if (confirm('Are you sure you want to delete this testimonial?')) {
             this.data.testimonials = this.data.testimonials.filter(t => t.id !== testimonialId);
-            this.saveData();
+            await this.saveData();
             this.loadTestimonials();
-            this.loadDashboard();
         }
     }
 
-    handleTestimonialSubmit(e) {
+    async handleTestimonialSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         const testimonialData = {
@@ -422,89 +658,11 @@ class PortfolioAdmin {
             this.data.testimonials.push(testimonialData);
         }
 
-        this.saveData();
+        await this.saveData();
         this.loadTestimonials();
-        this.loadDashboard();
         this.closeModal();
     }
 
-    // Services Management
-    loadServices() {
-        const grid = document.getElementById('servicesGrid');
-        if (!grid) return;
-
-        if (this.data.services.length === 0) {
-            grid.innerHTML = '<p style="color: var(--admin-muted); text-align: center; padding: 40px;">No services added yet. Click "Add Service" to get started.</p>';
-            return;
-        }
-
-        grid.innerHTML = this.data.services.map(service => `
-            <div class="content-card">
-                <div style="font-size: 24px; margin-bottom: 12px;">${service.icon}</div>
-                <h3>${service.title}</h3>
-                <p>${service.description}</p>
-                <div class="card-actions">
-                    <button class="btn btn-secondary" onclick="admin.editService('${service.id}')">Edit</button>
-                    <button class="btn btn-danger" onclick="admin.deleteService('${service.id}')">Delete</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    addService() {
-        this.currentEditingId = null;
-        document.getElementById('serviceModalTitle').textContent = 'Add New Service';
-        document.getElementById('serviceForm').reset();
-        document.getElementById('serviceModal').classList.add('active');
-    }
-
-    editService(serviceId) {
-        const service = this.data.services.find(s => s.id === serviceId);
-        if (!service) return;
-
-        this.currentEditingId = serviceId;
-        document.getElementById('serviceModalTitle').textContent = 'Edit Service';
-        document.getElementById('serviceIcon').value = service.icon;
-        document.getElementById('serviceTitle').value = service.title;
-        document.getElementById('serviceDescription').value = service.description;
-        document.getElementById('serviceModal').classList.add('active');
-    }
-
-    deleteService(serviceId) {
-        if (confirm('Are you sure you want to delete this service?')) {
-            this.data.services = this.data.services.filter(s => s.id !== serviceId);
-            this.saveData();
-            this.loadServices();
-            this.loadDashboard();
-        }
-    }
-
-    handleServiceSubmit(e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const serviceData = {
-            id: this.currentEditingId || Date.now().toString(),
-            icon: formData.get('serviceIcon'),
-            title: formData.get('serviceTitle'),
-            description: formData.get('serviceDescription')
-        };
-
-        if (this.currentEditingId) {
-            // Update existing service
-            const index = this.data.services.findIndex(s => s.id === this.currentEditingId);
-            if (index !== -1) {
-                this.data.services[index] = serviceData;
-            }
-        } else {
-            // Add new service
-            this.data.services.push(serviceData);
-        }
-
-        this.saveData();
-        this.loadServices();
-        this.loadDashboard();
-        this.closeModal();
-    }
 
     // About Management
     loadAbout() {
@@ -513,16 +671,38 @@ class PortfolioAdmin {
         document.getElementById('resumeLink').value = this.data.about.resume || '';
     }
 
-    handleAboutSubmit(e) {
+    async handleAboutSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
+        
+        let imageUrl = formData.get('profileImage');
+        
+        // Convert Google Drive link to direct image URL
+        if (imageUrl && imageUrl.includes('drive.google.com')) {
+            // Extract file ID from various Google Drive URL formats
+            let fileId = null;
+            
+            if (imageUrl.includes('/file/d/')) {
+                const match = imageUrl.match(/\/file\/d\/([^\/\?]+)/);
+                fileId = match ? match[1] : null;
+            } else if (imageUrl.includes('id=')) {
+                const match = imageUrl.match(/id=([^&]+)/);
+                fileId = match ? match[1] : null;
+            }
+            
+            if (fileId) {
+                // Use thumbnail API for better compatibility
+                imageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+            }
+        }
+        
         this.data.about = {
             text: formData.get('aboutText'),
-            image: formData.get('profileImage'),
+            image: imageUrl,
             resume: formData.get('resumeLink')
         };
-        this.saveData();
-        alert('About section updated successfully!');
+        await this.saveData();
+        alert('About section updated successfully! Profile image will update on the main page.');
     }
 
     // Contact Management
@@ -533,7 +713,7 @@ class PortfolioAdmin {
         document.getElementById('youtube').value = this.data.contact.youtube || '';
     }
 
-    handleContactSubmit(e) {
+    async handleContactSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         this.data.contact = {
@@ -542,7 +722,7 @@ class PortfolioAdmin {
             instagram: formData.get('instagram'),
             youtube: formData.get('youtube')
         };
-        this.saveData();
+        await this.saveData();
         alert('Contact information updated successfully!');
     }
 
@@ -553,6 +733,99 @@ class PortfolioAdmin {
         });
         this.currentEditingId = null;
     }
+
+    // Form Submissions Management
+    loadSubmissions() {
+        try {
+            const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+        
+        // Update stats
+        const totalSubmissionsEl = document.getElementById('totalSubmissions');
+        const recentSubmissionsEl = document.getElementById('recentSubmissions');
+        
+        if (totalSubmissionsEl) {
+            totalSubmissionsEl.textContent = submissions.length;
+        }
+        
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const recentSubmissions = submissions.filter(sub => new Date(sub.timestamp) > oneWeekAgo);
+        
+        if (recentSubmissionsEl) {
+            recentSubmissionsEl.textContent = recentSubmissions.length;
+        }
+        
+        // Display submissions
+        const submissionsList = document.getElementById('submissionsList');
+        if (!submissionsList) return;
+        
+        if (submissions.length === 0) {
+            submissionsList.innerHTML = '<div class="no-submissions"><p>No form submissions yet</p></div>';
+            return;
+        }
+        
+        submissionsList.innerHTML = submissions.map(submission => `
+            <div class="submission-card">
+                <div class="submission-header">
+                    <h4>${submission.name}</h4>
+                    <span class="submission-date">${new Date(submission.timestamp).toLocaleDateString()}</span>
+                    <span class="submission-status ${submission.status}">${submission.status}</span>
+                </div>
+                <div class="submission-details">
+                    <p><strong>Email:</strong> ${submission.email}</p>
+                    <p><strong>Phone:</strong> ${submission.phone}</p>
+                    <p><strong>Message:</strong> ${submission.message}</p>
+                </div>
+                <div class="submission-actions">
+                    <button onclick="admin.markAsRead('${submission.id}')" class="btn btn-sm">Mark as Read</button>
+                    <button onclick="admin.deleteSubmission('${submission.id}')" class="btn btn-sm btn-danger">Delete</button>
+                </div>
+            </div>
+        `).join('');
+        } catch (error) {
+            console.error('Error loading submissions:', error);
+            const submissionsList = document.getElementById('submissionsList');
+            if (submissionsList) {
+                submissionsList.innerHTML = '<div class="no-submissions"><p>Error loading submissions</p></div>';
+            }
+        }
+    }
+
+    async markAsRead(submissionId) {
+        const submission = this.data.submissions.find(sub => sub.id === submissionId);
+        if (submission) {
+            submission.status = 'read';
+            await this.saveData();
+            this.loadSubmissions();
+        } else {
+            console.error('Submission not found:', submissionId);
+        }
+    }
+
+    async deleteSubmission(submissionId) {
+        if (confirm('Are you sure you want to delete this submission?')) {
+            this.data.submissions = this.data.submissions.filter(sub => sub.id !== submissionId);
+            await this.saveData();
+            this.loadSubmissions();
+        }
+    }
+
+    async migrateLocalSubmissions() {
+        try {
+            // Check if there are any submissions in localStorage
+            const localSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+            
+            if (localSubmissions.length > 0 && this.data.submissions.length === 0) {
+                this.data.submissions = localSubmissions;
+                await this.saveData();
+                // Clear localStorage after successful migration
+                localStorage.removeItem('contactSubmissions');
+            }
+        } catch (error) {
+            console.error('Error migrating submissions:', error);
+        }
+    }
+
 
 }
 
@@ -569,9 +842,6 @@ function addTestimonial() {
     admin.addTestimonial();
 }
 
-function addService() {
-    admin.addService();
-}
 
 function closeModal() {
     admin.closeModal();
@@ -583,6 +853,12 @@ function logout() {
 
 // Initialize admin panel
 let admin;
+
 document.addEventListener('DOMContentLoaded', () => {
+    try {
     admin = new PortfolioAdmin();
+    } catch (error) {
+        console.error('Error initializing admin panel:', error);
+        document.body.innerHTML = '<div style="padding: 20px; color: red;">Error loading admin panel: ' + error.message + '</div>';
+    }
 });

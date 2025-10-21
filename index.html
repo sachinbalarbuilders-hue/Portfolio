@@ -49,12 +49,12 @@
       <div class="hero-overlay"></div>
       <div class="container hero-inner reveal-up">
         <h1 class="headline">
-          <span class="sub">Hi, I’m</span> <span class="name">Sonu Rawat</span>
+          <span class="sub typewriter-text" data-text="Hi, I'm"></span> <span class="name typewriter-text" data-text="Sonu Rawat"></span>
         </h1>
         <p class="tagline">A Freelance Video Editor Turning Raw Footage Into Cinematic Stories</p>
         <div class="hero-ctas">
           <a href="#work" class="btn btn-primary">🎬 Watch My Work</a>
-          <a href="#contact" class="btn btn-outline">📩 Hire Me</a>
+          <a href="#contact" class="btn btn-primary">📩 Hire Me</a>
         </div>
       </div>
     </section>
@@ -63,122 +63,91 @@
     <section id="work" class="work section">
       <div class="container">
         <h2 class="section-title reveal-up">My Work</h2>
-        <div class="grid work-grid">
-          <!-- Video Cards (YouTube IDs as data-video) - Replace with your actual video IDs -->
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_1" data-title="Latest Vlog" data-desc="My recent vlog content from @skvlog4848">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_1/hqdefault.jpg" alt="Latest Vlog thumbnail" />
-              <button class="play-btn" aria-label="Play Latest Vlog">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Latest Vlog</h3>
-              <p>My recent vlog content from @skvlog4848</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_2" data-title="Travel Content" data-desc="Adventure and travel storytelling">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_2/hqdefault.jpg" alt="Travel Content thumbnail" />
-              <button class="play-btn" aria-label="Play Travel Content">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Travel Content</h3>
-              <p>Adventure and travel storytelling</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_3" data-title="Lifestyle Vlog" data-desc="Day-to-day lifestyle content">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_3/hqdefault.jpg" alt="Lifestyle Vlog thumbnail" />
-              <button class="play-btn" aria-label="Play Lifestyle Vlog">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Lifestyle Vlog</h3>
-              <p>Day-to-day lifestyle content</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_4" data-title="Creative Edit" data-desc="Showcasing editing skills and creativity">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_4/hqdefault.jpg" alt="Creative Edit thumbnail" />
-              <button class="play-btn" aria-label="Play Creative Edit">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Creative Edit</h3>
-              <p>Showcasing editing skills and creativity</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_5" data-title="Behind the Scenes" data-desc="Video editing process and techniques">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_5/hqdefault.jpg" alt="Behind the Scenes thumbnail" />
-              <button class="play-btn" aria-label="Play Behind the Scenes">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Behind the Scenes</h3>
-              <p>Video editing process and techniques</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_6" data-title="Tutorial Content" data-desc="Educational video editing content">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_6/hqdefault.jpg" alt="Tutorial Content thumbnail" />
-              <button class="play-btn" aria-label="Play Tutorial Content">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Tutorial Content</h3>
-              <p>Educational video editing content</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_7" data-title="Project Showcase" data-desc="Highlighting completed video projects">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_7/hqdefault.jpg" alt="Project Showcase thumbnail" />
-              <button class="play-btn" aria-label="Play Project Showcase">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Project Showcase</h3>
-              <p>Highlighting completed video projects</p>
-            </div>
-          </article>
-          <article class="work-item reveal-up" data-video="YOUR_VIDEO_ID_8" data-title="Channel Trailer" data-desc="Introduction to my YouTube channel">
-            <div class="thumb">
-              <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID_8/hqdefault.jpg" alt="Channel Trailer thumbnail" />
-              <button class="play-btn" aria-label="Play Channel Trailer">▶</button>
-            </div>
-            <div class="work-meta">
-              <h3>Channel Trailer</h3>
-              <p>Introduction to my YouTube channel</p>
-            </div>
-          </article>
+        <div class="work-slider-container">
+          <button class="work-nav work-nav-left" aria-label="Previous videos">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <div class="grid work-grid">
+            <!-- Videos will be loaded dynamically from admin panel -->
+          </div>
+          <button class="work-nav work-nav-right" aria-label="Next videos">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
     </section>
 
     <!-- About -->
     <section id="about" class="about section">
-      <div class="container about-grid">
-        <div class="about-media reveal-up">
-          <div class="portrait">
-            <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1200&auto=format&fit=crop" alt="Portrait of Sonu Rawat" />
+      <div class="container">
+        <h2 class="section-title reveal-up">About Me</h2>
+        <div class="about-grid">
+          <div class="about-media reveal-up">
+            <div class="portrait-container">
+              <div class="portrait">
+                <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1200&auto=format&fit=crop" alt="Portrait of Sonu Rawat" />
+                <div class="portrait-overlay">
+                  <div class="portrait-badge">
+                    <span class="badge-icon">🎬</span>
+                    <span class="badge-text">Video Editor</span>
+                  </div>
+                </div>
+              </div>
+              <div class="portrait-stats">
+                <div class="stat-item">
+                  <span class="stat-number">3+</span>
+                  <span class="stat-label">Years</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">100+</span>
+                  <span class="stat-label">Projects</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">50+</span>
+                  <span class="stat-label">Clients</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="about-content reveal-up">
-          <h2 class="section-title">About Me</h2>
-          <p class="about-text">I'm a passionate video editor with over 3 years of experience crafting reels, cinematic brand promos, and YouTube content. My goal is to tell visual stories that captivate audiences and deliver impact.</p>
-          <div class="about-actions">
-            <a class="btn btn-primary" href="resume.pdf" download>Download Resume</a>
-          </div>
-          <div class="skills">
-            <div class="skill">
-              <div class="skill-head"><span>Premiere Pro</span><span class="skill-val">95%</span></div>
-              <div class="bar"><span data-progress="95"></span></div>
+          <div class="about-content reveal-up">
+            <div class="about-intro">
+              <h3 class="about-subtitle">Creative Video Editor & Storyteller</h3>
+              <p class="about-text">I'm a passionate video editor with over 3 years of experience crafting reels, cinematic brand promos, and YouTube content. My goal is to tell visual stories that captivate audiences and deliver impact.</p>
             </div>
-            <div class="skill">
-              <div class="skill-head"><span>After Effects</span><span class="skill-val">95%</span></div>
-              <div class="bar"><span data-progress="95"></span></div>
+            <div class="about-actions">
+              <a class="btn btn-primary" href="resume.pdf" download>
+                <span class="btn-icon">📄</span>
+                Download Resume
+              </a>
+              <a class="btn btn-outline" href="#contact">
+                <span class="btn-icon">💬</span>
+                Let's Talk
+              </a>
             </div>
-            <div class="skill">
-              <div class="skill-head"><span>Sound Design</span><span class="skill-val">95%</span></div>
-              <div class="bar"><span data-progress="95"></span></div>
-            </div>
-            <div class="skill">
-              <div class="skill-head"><span>Color Grading</span><span class="skill-val">85%</span></div>
-              <div class="bar"><span data-progress="85"></span></div>
+            <div class="skills-section">
+              <h4 class="skills-title">Technical Skills</h4>
+              <div class="skills">
+                <div class="skill">
+                  <div class="skill-head"><span>Premiere Pro</span><span class="skill-val">95%</span></div>
+                  <div class="bar"><span data-progress="95"></span></div>
+                </div>
+                <div class="skill">
+                  <div class="skill-head"><span>After Effects</span><span class="skill-val">95%</span></div>
+                  <div class="bar"><span data-progress="95"></span></div>
+                </div>
+                <div class="skill">
+                  <div class="skill-head"><span>Sound Design</span><span class="skill-val">95%</span></div>
+                  <div class="bar"><span data-progress="95"></span></div>
+                </div>
+                <div class="skill">
+                  <div class="skill-head"><span>Color Grading</span><span class="skill-val">85%</span></div>
+                  <div class="bar"><span data-progress="85"></span></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -193,22 +162,26 @@
           <article class="service-card tilt reveal-up">
             <div class="icon">🎥</div>
             <h3>Reels & Short-form Edits</h3>
-            <p>Snappy edits that hook audiences in seconds.</p>
+            <p>Professional short-form content creation with viral-optimized pacing, trending transitions, and engagement-focused editing that drives maximum reach and audience retention.</p>
           </article>
           <article class="service-card tilt reveal-up">
-            <div class="icon">📺</div>
+            <div class="icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="#ff0000">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </div>
             <h3>YouTube Video Editing</h3>
-            <p>Engaging long-form content with strong pacing.</p>
+            <p>Long-form content mastery with strategic pacing, retention-focused storytelling, and professional post-production that maximizes watch time and viewer engagement.</p>
           </article>
           <article class="service-card tilt reveal-up">
             <div class="icon">🎬</div>
             <h3>Cinematic Brand Promos</h3>
-            <p>Premium visuals that elevate your brand.</p>
+            <p>Hollywood-quality brand storytelling with professional color grading, motion graphics, and cinematic techniques that elevate your brand's visual identity and market presence.</p>
           </article>
           <article class="service-card tilt reveal-up">
             <div class="icon">🎧</div>
             <h3>Sound Design & Color Grading</h3>
-            <p>Immersive audio and impactful color science.</p>
+            <p>Professional audio-visual post-production with advanced color correction, custom sound design, and technical polish that transforms content into broadcast-quality productions.</p>
           </article>
         </div>
       </div>
@@ -257,13 +230,16 @@
           <h2 class="section-title">Let’s Work Together</h2>
           <form id="contactForm" novalidate>
             <div class="form-row">
-              <input type="text" id="name" name="name" placeholder="Name" required />
+              <input type="text" id="name" name="name" placeholder="Your Full Name" required />
             </div>
             <div class="form-row">
-              <input type="email" id="email" name="email" placeholder="Email" required />
+              <input type="email" id="email" name="email" placeholder="Email Address" required />
             </div>
             <div class="form-row">
-              <textarea id="message" name="message" placeholder="Message" rows="5" required></textarea>
+              <input type="tel" id="phone" name="phone" placeholder="Phone Number" required />
+            </div>
+            <div class="form-row">
+              <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Send Message</button>
           </form>
@@ -274,7 +250,7 @@
             <li>📧 Email: <a href="mailto:sonurawat848484@gmail.com">sonurawat848484@gmail.com</a></li>
           </ul>
           <div class="socials">
-            <a class="social" href="https://instagram.com/SK_RAWAT48" aria-label="Instagram">
+            <a class="social" href="https://www.instagram.com/sonurawat4848/" aria-label="Instagram">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
                 <defs>
                   <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -302,27 +278,6 @@
     <footer class="footer">
       <div class="gradient-border"></div>
       <div class="container footer-inner">
-        <div class="footer-socials">
-          <a class="social sm" href="https://instagram.com/SK_RAWAT48" aria-label="Instagram">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="url(#instagram-gradient-footer)">
-              <defs>
-                <linearGradient id="instagram-gradient-footer" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#f58529;stop-opacity:1" />
-                  <stop offset="25%" style="stop-color:#dd2a7b;stop-opacity:1" />
-                  <stop offset="50%" style="stop-color:#8134af;stop-opacity:1" />
-                  <stop offset="75%" style="stop-color:#515bd4;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#405de6;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-6.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-          </a>
-          <a class="social sm" href="https://youtube.com/@skvlog4848" aria-label="YouTube">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0000">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-          </a>
-        </div>
         <p>© 2025 Sonu Rawat. All Rights Reserved.</p>
       </div>
       <button id="toTop" class="to-top" aria-label="Back to top">↑</button>
@@ -342,6 +297,7 @@
       <a href="admin.html" style="background: rgba(139,92,246,0.1); color: #8b5cf6; padding: 8px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; border: 1px solid rgba(139,92,246,0.3); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.opacity='1'; this.style.background='rgba(139,92,246,0.2)'" onmouseout="this.style.opacity='0.7'; this.style.background='rgba(139,92,246,0.1)'">⚙️ Admin</a>
     </div>
 
+    <script src="api-service.js"></script>
     <script src="script.js"></script>
     <script src="sync.js"></script>
   </body>

@@ -4,7 +4,8 @@
 class PortfolioSync {
     constructor() {
         this.data = this.loadData();
-        this.init();
+        // Small delay to ensure DOM is ready
+        setTimeout(() => this.init(), 100);
     }
 
     loadData() {
@@ -32,23 +33,295 @@ class PortfolioSync {
     }
 
     updateVideos() {
-        if (!this.data.videos || this.data.videos.length === 0) return;
-        
-        const videosGrid = document.querySelector('#work .work-grid');
+        const videosGrid = document.querySelector('#work .grid.work-grid');
         if (!videosGrid) return;
 
-        videosGrid.innerHTML = this.data.videos.map((video, index) => `
-            <article class="work-item reveal-up" data-video="${video.id}" data-title="${video.title}" data-desc="${video.description}">
+        if (!this.data.videos || this.data.videos.length === 0) {
+            // Hide the work section if no videos
+            const workSection = document.querySelector('#work');
+            if (workSection) {
+                workSection.style.display = 'none';
+            }
+            // Hide the work link in navigation
+            const workLink = document.querySelector('a[href="#work"]');
+            if (workLink) {
+                workLink.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show the work section and update videos
+        const workSection = document.querySelector('#work');
+        if (workSection) {
+            workSection.style.display = 'block';
+        }
+        // Show the work link in navigation
+        const workLink = document.querySelector('a[href="#work"]');
+        if (workLink) {
+            workLink.style.display = 'block';
+        }
+
+        videosGrid.innerHTML = this.data.videos.map((video, index) => {
+            const isInstagram = video.platform === 'instagram';
+            const isGoogleDrive = video.platform === 'googledrive';
+            const isVimeo = video.platform === 'vimeo';
+            const isYouTubeShort = video.platform === 'youtube' && video.type === 'short';
+            const isYouTubeVideo = video.platform === 'youtube' && video.type === 'video';
+            
+            let thumbnailUrl, platformIcon, platformBadge;
+            
+            if (isInstagram) {
+                // Instagram doesn't provide reliable public thumbnails, use placeholder
+                thumbnailUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtIFJlZWw8L3RleHQ+Cjwvc3ZnPg==';
+                platformIcon = '📱';
+                platformBadge = 'Instagram Reel';
+            } else if (isGoogleDrive) {
+                // Use Google Drive thumbnail with multiple fallback options
+                thumbnailUrl = `https://drive.google.com/thumbnail?id=${video.id}&sz=w400-h225`;
+                platformIcon = '☁️';
+                platformBadge = 'Google Drive';
+            } else if (isVimeo) {
+                // Use Vimeo thumbnail API
+                thumbnailUrl = `https://vumbnail.com/${video.id}.jpg`;
+                platformIcon = '🎬';
+                platformBadge = 'Vimeo Video';
+            } else if (isYouTubeShort) {
+                thumbnailUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                platformIcon = '🎬';
+                platformBadge = 'YouTube Short';
+            } else {
+                thumbnailUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                platformIcon = '🎥';
+                platformBadge = 'YouTube Video';
+            }
+            
+            return `
+            <article class="work-item" data-video="${video.id}" data-platform="${video.platform}" data-type="${video.type || 'video'}" data-url="${video.url}" data-title="${video.title}" data-desc="${video.description}">
                 <div class="thumb">
-                    <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" alt="${video.title} thumbnail" />
-                    <button class="play-btn" aria-label="Play ${video.title}">▶</button>
+                    <img src="${thumbnailUrl}" alt="${video.title} thumbnail" ${!isInstagram ? `onerror="this.src='${isGoogleDrive ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjNDI4NWY0Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+R29vZ2xlIERyaXZlPC90ZXh0Pgo8L3N2Zz4=' : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtIFJlZWw8L3RleHQ+Cjwvc3ZnPg=='}"` : ''} />
+                    <button class="play-btn" aria-label="Play ${video.title}">${platformIcon}</button>
                 </div>
                 <div class="work-meta">
                     <h3>${video.title}</h3>
                     <p>${video.description}</p>
+                    <div class="platform-badge">${platformBadge}</div>
                 </div>
             </article>
-        `).join('');
+        `;
+        }).join('');
+        
+        // Make sure all video elements are visible
+        Array.from(videosGrid.children).forEach((videoElement) => {
+            videoElement.style.opacity = '1';
+            videoElement.style.transform = 'translateY(0)';
+        });
+        
+        // Add click handlers for video play buttons
+        this.setupVideoClickHandlers();
+    }
+
+    setupVideoClickHandlers() {
+        // Add click handlers for play buttons
+        const playButtons = document.querySelectorAll('.play-btn');
+        playButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const workItem = button.closest('.work-item');
+                const videoId = workItem.getAttribute('data-video');
+                const platform = workItem.getAttribute('data-platform');
+                const videoUrl = workItem.getAttribute('data-url');
+                const videoTitle = workItem.getAttribute('data-title');
+                
+                if (platform === 'instagram') {
+                    // Open Instagram Reel in new tab
+                    window.open(videoUrl, '_blank');
+                } else if (platform === 'googledrive') {
+                    // Open Google Drive video in modal
+                    this.openGoogleDriveModal(videoId, videoTitle);
+                } else if (platform === 'vimeo') {
+                    // Open Vimeo video in modal
+                    this.openVimeoModal(videoId, videoTitle);
+                } else {
+                    // Open YouTube video in modal
+                    this.openVideoModal(videoId, videoTitle);
+                }
+            });
+        });
+        
+        // Add click handlers for entire video cards
+        const workItems = document.querySelectorAll('.work-item');
+        workItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Don't trigger if clicking on the play button (already handled above)
+                if (e.target.classList.contains('play-btn') || e.target.closest('.play-btn')) {
+                    return;
+                }
+                
+                const videoId = item.getAttribute('data-video');
+                const platform = item.getAttribute('data-platform');
+                const videoUrl = item.getAttribute('data-url');
+                const videoTitle = item.getAttribute('data-title');
+                
+                if (platform === 'instagram') {
+                    // Open Instagram Reel in new tab
+                    window.open(videoUrl, '_blank');
+                } else if (platform === 'googledrive') {
+                    // Open Google Drive video in modal
+                    this.openGoogleDriveModal(videoId, videoTitle);
+                } else if (platform === 'vimeo') {
+                    // Open Vimeo video in modal
+                    this.openVimeoModal(videoId, videoTitle);
+                } else {
+                    // Open YouTube video in modal
+                    this.openVideoModal(videoId, videoTitle);
+                }
+            });
+        });
+    }
+
+    openVideoModal(videoId, videoTitle) {
+        // Remove any existing video modal first
+        const existingModal = document.getElementById('videoModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Create new video modal
+        const modal = document.createElement('div');
+        modal.id = 'videoModal';
+        modal.className = 'video-modal';
+        modal.style.display = 'flex';
+        
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'video-modal-content';
+        
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'video-close-btn';
+        closeBtn.innerHTML = '&times;';
+        
+        // Create video container
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+        
+        // Create iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'videoPlayer';
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.frameBorder = '0';
+        iframe.allowFullscreen = true;
+        
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        iframe.src = embedUrl;
+        
+        // Assemble the modal
+        videoContainer.appendChild(iframe);
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(videoContainer);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Add close functionality
+        closeBtn.addEventListener('click', () => this.closeVideoModal());
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeVideoModal();
+            }
+        });
+        
+        // Close on Escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                this.closeVideoModal();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeVideoModal() {
+        const modal = document.getElementById('videoModal');
+        if (modal) {
+            const iframe = modal.querySelector('#videoPlayer');
+            if (iframe) {
+                iframe.src = '';
+            }
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    openGoogleDriveModal(videoId, videoTitle) {
+        // Remove any existing video modal first
+        const existingModal = document.getElementById('videoModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Create new video modal
+        const modal = document.createElement('div');
+        modal.id = 'videoModal';
+        modal.className = 'video-modal';
+        modal.style.display = 'flex';
+
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'video-modal-content';
+
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'video-close-btn';
+        closeBtn.innerHTML = '&times;';
+
+        // Create video container
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+
+        // Create iframe for Google Drive
+        const iframe = document.createElement('iframe');
+        iframe.id = 'videoPlayer';
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.frameBorder = '0';
+        iframe.allowFullscreen = true;
+        iframe.src = `https://drive.google.com/file/d/${videoId}/preview`;
+
+        // Assemble the modal
+        videoContainer.appendChild(iframe);
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(videoContainer);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        // Add close functionality
+        closeBtn.addEventListener('click', () => this.closeVideoModal());
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeVideoModal();
+            }
+        });
+
+        // Close on Escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                this.closeVideoModal();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
     }
 
     updateTestimonials() {
@@ -67,6 +340,58 @@ class PortfolioSync {
                 <div class="stars" aria-label="${testimonial.rating} star rating">${'★'.repeat(testimonial.rating)}${'☆'.repeat(5-testimonial.rating)}</div>
             </article>
         `).join('');
+        
+        // Reinitialize carousel after updating testimonials
+        this.reinitializeCarousel();
+    }
+
+    reinitializeCarousel() {
+        // Find the testimonials carousel
+        const carousel = document.querySelector('[data-carousel]');
+        if (!carousel) return;
+
+        const track = carousel.querySelector('.carousel-track');
+        const slides = Array.from(carousel.querySelectorAll('.testimonial'));
+        const dotsWrap = carousel.querySelector('.carousel-dots');
+        
+        if (!track || slides.length === 0 || !dotsWrap) return;
+
+        // Clear existing dots
+        dotsWrap.innerHTML = '';
+
+        let index = 0;
+        const update = () => {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            dotsWrap.querySelectorAll('button').forEach((b, i) => b.classList.toggle('active', i === index));
+        };
+
+        // Create dots for each slide
+        slides.forEach((_, i) => {
+            const b = document.createElement('button');
+            if (i === 0) b.classList.add('active');
+            b.addEventListener('click', () => { index = i; update(); });
+            dotsWrap.appendChild(b);
+        });
+
+        // Clear any existing timer
+        if (carousel.timer) {
+            clearInterval(carousel.timer);
+        }
+
+        // Set up auto-rotation
+        carousel.timer = setInterval(() => { 
+            index = (index + 1) % slides.length; 
+            update(); 
+        }, 4500);
+
+        // Handle mouse events
+        carousel.addEventListener('mouseenter', () => clearInterval(carousel.timer));
+        carousel.addEventListener('mouseleave', () => { 
+            carousel.timer = setInterval(() => { 
+                index = (index + 1) % slides.length; 
+                update(); 
+            }, 4500); 
+        });
     }
 
     updateServices() {
@@ -76,31 +401,31 @@ class PortfolioSync {
         if (!servicesGrid) return;
 
         servicesGrid.innerHTML = this.data.services.map(service => `
-            <article class="service-card tilt reveal-up">
-                <div class="icon">${service.icon}</div>
+            <div class="service-card">
+                <div class="service-icon">${service.icon}</div>
                 <h3>${service.title}</h3>
                 <p>${service.description}</p>
-            </article>
+            </div>
         `).join('');
     }
 
     updateAbout() {
         if (!this.data.about) return;
         
-        // Update about text
-        const aboutText = document.querySelector('.about-text');
+        const aboutText = document.querySelector('#about .about-text');
         if (aboutText && this.data.about.text) {
             aboutText.textContent = this.data.about.text;
         }
         
-        // Update profile image
-        const profileImg = document.querySelector('.portrait img');
+        const profileImg = document.querySelector('#about .portrait img');
         if (profileImg && this.data.about.image) {
-            profileImg.src = this.data.about.image;
+            // Add cache buster to force image refresh
+            const imageUrl = this.data.about.image;
+            const cacheBuster = imageUrl.includes('?') ? '&' : '?';
+            profileImg.src = imageUrl + cacheBuster + 't=' + Date.now();
         }
         
-        // Update resume link
-        const resumeLink = document.querySelector('a[href="resume.pdf"]');
+        const resumeLink = document.querySelector('#about .btn-primary[download]');
         if (resumeLink && this.data.about.resume) {
             resumeLink.href = this.data.about.resume;
         }
@@ -109,39 +434,32 @@ class PortfolioSync {
     updateContact() {
         if (!this.data.contact) return;
         
-        // Update email
         const emailLink = document.querySelector('a[href^="mailto:"]');
         if (emailLink && this.data.contact.email) {
             emailLink.href = `mailto:${this.data.contact.email}`;
             emailLink.textContent = this.data.contact.email;
         }
         
-        // Update WhatsApp
-        const whatsappLink = document.querySelector('a[aria-label="WhatsApp link to be added"]');
+        const whatsappLink = document.querySelector('a[href*="wa.me"]');
         if (whatsappLink && this.data.contact.whatsapp) {
-            whatsappLink.href = this.data.contact.whatsapp;
-            whatsappLink.textContent = this.data.contact.whatsapp;
+            whatsappLink.href = `https://wa.me/${this.data.contact.whatsapp}`;
         }
         
-        // Update Instagram
-        const instagramLinks = document.querySelectorAll('a[aria-label="Instagram"]');
-        instagramLinks.forEach(link => {
-            if (this.data.contact.instagram) {
-                link.href = `https://instagram.com/${this.data.contact.instagram.replace('@', '')}`;
-            }
-        });
+        const instagramLink = document.querySelector('a[href*="instagram.com"]');
+        if (instagramLink && this.data.contact.instagram) {
+            // Remove @ symbol if present and format as proper Instagram URL
+            const handle = this.data.contact.instagram.replace('@', '');
+            instagramLink.href = `https://www.instagram.com/${handle}/`;
+        }
         
-        // Update YouTube
-        const youtubeLinks = document.querySelectorAll('a[aria-label="YouTube"]');
-        youtubeLinks.forEach(link => {
-            if (this.data.contact.youtube) {
-                link.href = this.data.contact.youtube;
-            }
-        });
+        const youtubeLink = document.querySelector('a[href*="youtube.com"]');
+        if (youtubeLink && this.data.contact.youtube) {
+            youtubeLink.href = this.data.contact.youtube;
+        }
     }
 }
 
-// Initialize sync when DOM is loaded
+// Initialize the sync when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     new PortfolioSync();
 });
