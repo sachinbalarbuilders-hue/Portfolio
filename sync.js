@@ -3,33 +3,65 @@
 
 class PortfolioSync {
     constructor() {
-        this.data = this.loadData();
+        this.api = new PortfolioAPI();
+        this.data = null;
         // Small delay to ensure DOM is ready
         setTimeout(() => this.init(), 100);
     }
 
-    loadData() {
-        const saved = localStorage.getItem('portfolioData');
-        return saved ? JSON.parse(saved) : null;
+    async init() {
+        try {
+            // Show loading state
+            this.showLoading();
+            
+            // Load data from cloud
+            this.data = await this.api.getData();
+            
+            if (!this.data) {
+                console.error('No data available');
+                this.hideLoading();
+                return;
+            }
+            
+            // Update all sections
+            this.updateVideos();
+            this.updateTestimonials();
+            this.updateServices();
+            this.updateAbout();
+            this.updateContact();
+            
+            // Hide loading state
+            this.hideLoading();
+        } catch (error) {
+            console.error('Error loading portfolio data:', error);
+            this.hideLoading();
+        }
     }
-
-    init() {
-        if (!this.data) return;
+    
+    showLoading() {
+        // Add loading indicator to work section
+        const workGrid = document.querySelector('#work .work-grid');
+        if (workGrid) {
+            workGrid.innerHTML = '<div class="loading-placeholder" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">Loading videos...</div>';
+        }
         
-        // Update videos
-        this.updateVideos();
+        // Add loading to profile picture
+        const profileImg = document.querySelector('#about .portrait img');
+        if (profileImg) {
+            profileImg.style.opacity = '0.3';
+        }
+    }
+    
+    hideLoading() {
+        // Remove loading placeholders
+        const loadingPlaceholders = document.querySelectorAll('.loading-placeholder');
+        loadingPlaceholders.forEach(el => el.remove());
         
-        // Update testimonials
-        this.updateTestimonials();
-        
-        // Update services
-        this.updateServices();
-        
-        // Update about section
-        this.updateAbout();
-        
-        // Update contact info
-        this.updateContact();
+        // Restore profile picture opacity
+        const profileImg = document.querySelector('#about .portrait img');
+        if (profileImg) {
+            profileImg.style.opacity = '1';
+        }
     }
 
     updateVideos() {
