@@ -63,18 +63,44 @@ const revealObserver = new IntersectionObserver((entries) => {
 revealEls.forEach(el => revealObserver.observe(el));
 
 // About skill bars animate when visible
-const skillBars = document.querySelectorAll('.bar span');
-const skillsObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const bar = entry.target;
-      const val = bar.getAttribute('data-progress');
-      if (val) bar.style.width = val + '%';
-      skillsObserver.unobserve(bar);
+let skillBarsAnimated = false;
+
+function animateSkillBars() {
+  const skillBars = document.querySelectorAll('.bar span');
+  skillBars.forEach((bar, index) => {
+    const val = bar.getAttribute('data-progress');
+    if (val) {
+      bar.style.width = '0%';
+      setTimeout(() => {
+        bar.style.width = val + '%';
+      }, index * 200); // Stagger animation for each bar
     }
   });
-}, { threshold: 0.2 });
-skillBars.forEach(b => skillsObserver.observe(b));
+  skillBarsAnimated = true;
+}
+
+function resetSkillBars() {
+  const skillBars = document.querySelectorAll('.bar span');
+  skillBars.forEach(bar => {
+    bar.style.width = '0%';
+  });
+  skillBarsAnimated = false;
+}
+
+// Scroll listener for skills animation
+window.addEventListener('scroll', () => {
+  const aboutSection = document.getElementById('about');
+  if (aboutSection) {
+    const rect = aboutSection.getBoundingClientRect();
+    const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2;
+    
+    if (isInView && !skillBarsAnimated) {
+      animateSkillBars();
+    } else if (!isInView && skillBarsAnimated) {
+      resetSkillBars();
+    }
+  }
+});
 
 // Portfolio modal + hover preview
 const modal = document.getElementById('videoModal');
@@ -84,8 +110,25 @@ function openVideoModal(videoId) {
   if (!modal || !modalBody) return;
   modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
-  const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0&controls=1&modestbranding=1`;
-  modalBody.innerHTML = `<iframe src="${src}" title="YouTube video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  
+  // Enhanced YouTube embed with better controls
+  const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0&controls=1&modestbranding=1&showinfo=0&fs=1&cc_load_policy=1`;
+  modalBody.innerHTML = `
+    <div class="video-container">
+      <iframe 
+        src="${src}" 
+        title="YouTube video player" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        allowfullscreen>
+      </iframe>
+      <div class="video-actions">
+        <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="external-link">
+          🎬 Watch on YouTube
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 function closeVideoModal() {
