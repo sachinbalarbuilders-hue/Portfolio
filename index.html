@@ -12,7 +12,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -69,9 +69,9 @@
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
-          <div class="grid work-grid">
+        <div class="grid work-grid">
             <!-- Videos will be loaded dynamically from admin panel -->
-          </div>
+            </div>
           <button class="work-nav work-nav-right" aria-label="Next videos">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
@@ -84,12 +84,20 @@
     <!-- About -->
     <section id="about" class="about section">
       <div class="container">
+        <a href="resume.pdf" download class="resume-download-icon" aria-label="Click to Download My Resume">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span class="resume-tooltip">Click to Download My Resume</span>
+        </a>
         <h2 class="section-title reveal-up">About Me</h2>
         <div class="about-grid">
-          <div class="about-media reveal-up">
+        <div class="about-media reveal-up">
             <div class="portrait-container">
-              <div class="portrait">
-                <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1200&auto=format&fit=crop" alt="Portrait of Sonu Rawat" />
+          <div class="portrait">
+                <img src="" alt="Portrait of Sonu Rawat" />
                 <div class="portrait-overlay">
                   <div class="portrait-badge">
                     <span class="badge-icon">🎬</span>
@@ -111,41 +119,31 @@
                   <span class="stat-label">Clients</span>
                 </div>
               </div>
-            </div>
           </div>
-          <div class="about-content reveal-up">
+        </div>
+        <div class="about-content reveal-up">
             <div class="about-intro">
               <h3 class="about-subtitle">Creative Video Editor & Storyteller</h3>
-              <p class="about-text">I'm a passionate video editor with over 3 years of experience crafting reels, cinematic brand promos, and YouTube content. My goal is to tell visual stories that captivate audiences and deliver impact.</p>
-            </div>
-            <div class="about-actions">
-              <a class="btn btn-primary" href="resume.pdf" download>
-                <span class="btn-icon">📄</span>
-                Download Resume
-              </a>
-              <a class="btn btn-outline" href="#contact">
-                <span class="btn-icon">💬</span>
-                Let's Talk
-              </a>
-            </div>
+          <p class="about-text">I'm a passionate video editor with over 3 years of experience crafting reels, cinematic brand promos, and YouTube content. My goal is to tell visual stories that captivate audiences and deliver impact.</p>
+          </div>
             <div class="skills-section">
               <h4 class="skills-title">Technical Skills</h4>
-              <div class="skills">
-                <div class="skill">
-                  <div class="skill-head"><span>Premiere Pro</span><span class="skill-val">95%</span></div>
-                  <div class="bar"><span data-progress="95"></span></div>
-                </div>
-                <div class="skill">
-                  <div class="skill-head"><span>After Effects</span><span class="skill-val">95%</span></div>
-                  <div class="bar"><span data-progress="95"></span></div>
-                </div>
-                <div class="skill">
-                  <div class="skill-head"><span>Sound Design</span><span class="skill-val">95%</span></div>
-                  <div class="bar"><span data-progress="95"></span></div>
-                </div>
-                <div class="skill">
-                  <div class="skill-head"><span>Color Grading</span><span class="skill-val">85%</span></div>
-                  <div class="bar"><span data-progress="85"></span></div>
+          <div class="skills">
+            <div class="skill">
+              <div class="skill-head"><span>Premiere Pro</span><span class="skill-val">95%</span></div>
+              <div class="bar"><span data-progress="95"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-head"><span>After Effects</span><span class="skill-val">95%</span></div>
+              <div class="bar"><span data-progress="95"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-head"><span>Sound Design</span><span class="skill-val">95%</span></div>
+              <div class="bar"><span data-progress="95"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-head"><span>Color Grading</span><span class="skill-val">85%</span></div>
+              <div class="bar"><span data-progress="85"></span></div>
                 </div>
               </div>
             </div>
@@ -191,84 +189,100 @@
     <section id="testimonials" class="testimonials section">
       <div class="container">
         <h2 class="section-title reveal-up">Client Feedback</h2>
-        <div class="carousel reveal-up" data-carousel>
-          <div class="carousel-track">
-            <article class="testimonial">
-              <p>“Sonu transformed our raw clips into a cinematic ad that boosted conversions.”</p>
-              <div class="meta">
-                <span class="name">Aarav Mehta</span>
-                <span class="role">Brand Promo</span>
-              </div>
-              <div class="stars" aria-label="5 star rating">★★★★★</div>
-            </article>
-            <article class="testimonial">
-              <p>“Fast, creative, and professional. Our YouTube channel quality jumped instantly.”</p>
-              <div class="meta">
-                <span class="name">Riya Kapoor</span>
-                <span class="role">YouTube Editing</span>
-              </div>
-              <div class="stars" aria-label="5 star rating">★★★★★</div>
-            </article>
-            <article class="testimonial">
-              <p>“Great sense of rhythm and storytelling. Our event highlights were perfect.”</p>
-              <div class="meta">
-                <span class="name">Karan Singh</span>
-                <span class="role">Event Recap</span>
-              </div>
-              <div class="stars" aria-label="5 star rating">★★★★★</div>
-            </article>
+        <div class="testimonials-grid">
+          <div class="testimonials-track">
+            <!-- Testimonials will be loaded from admin panel -->
           </div>
-          <div class="carousel-dots" aria-hidden="true"></div>
         </div>
       </div>
     </section>
 
     <!-- Contact -->
     <section id="contact" class="contact section">
-      <div class="container contact-grid">
-        <div class="contact-form reveal-up">
-          <h2 class="section-title">Let’s Work Together</h2>
-          <form id="contactForm" novalidate>
-            <div class="form-row">
-              <input type="text" id="name" name="name" placeholder="Your Full Name" required />
+      <div class="container">
+        <h2 class="section-title reveal-up">Get In Touch</h2>
+        <div class="contact-unified reveal-up">
+          <div class="contact-left">
+            <div class="contact-intro">
+              <h3>Let's Work Together</h3>
+              <p>Ready to bring your vision to life? Send me a message and let's discuss your project.</p>
             </div>
-            <div class="form-row">
-              <input type="email" id="email" name="email" placeholder="Email Address" required />
+            <form id="contactForm" class="contact-form" novalidate>
+              <div class="form-row">
+                <input type="text" id="name" name="name" placeholder="Your Full Name" required />
+              </div>
+              <div class="form-row">
+                <input type="email" id="email" name="email" placeholder="Email Address (Optional)" />
+              </div>
+              <div class="form-row">
+                <input type="tel" id="phone" name="phone" placeholder="Phone Number" required />
+              </div>
+              <div class="form-row">
+                <textarea id="message" name="message" placeholder="Tell me about your project..." rows="5" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <span>Send Message</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                </svg>
+              </button>
+            </form>
+          </div>
+          
+          <div class="contact-right">
+            <div class="contact-info">
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                </div>
+                <div class="contact-text">
+                  <h4>Email</h4>
+                  <a href="mailto:sonurawat848484@gmail.com">sonurawat848484@gmail.com</a>
+                </div>
+              </div>
+              
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12,6 12,12 16,14"></polyline>
+                  </svg>
+                </div>
+                <div class="contact-text">
+                  <h4>Response Time</h4>
+                  <p>Within 24 hours</p>
+                </div>
+              </div>
+              
+              <div class="social-links">
+                <h4>Follow Me</h4>
+                <div class="socials">
+                  <a class="social" href="https://www.instagram.com/sonurawat4848/" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+                      <defs>
+                        <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" style="stop-color:#f58529;stop-opacity:1" />
+                          <stop offset="25%" style="stop-color:#dd2a7b;stop-opacity:1" />
+                          <stop offset="50%" style="stop-color:#8134af;stop-opacity:1" />
+                          <stop offset="75%" style="stop-color:#515bd4;stop-opacity:1" />
+                          <stop offset="100%" style="stop-color:#405de6;stop-opacity:1" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                  </a>
+                  <a class="social" href="https://youtube.com/@skvlog4848" aria-label="YouTube">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff0000">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
-            <div class="form-row">
-              <input type="tel" id="phone" name="phone" placeholder="Phone Number" required />
-            </div>
-            <div class="form-row">
-              <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-          </form>
-        </div>
-        <div class="contact-info reveal-up">
-          <p class="cta-line">Let’s Create Something Amazing!</p>
-          <ul class="contact-list">
-            <li>📧 Email: <a href="mailto:sonurawat848484@gmail.com">sonurawat848484@gmail.com</a></li>
-          </ul>
-          <div class="socials">
-            <a class="social" href="https://www.instagram.com/sonurawat4848/" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
-                <defs>
-                  <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#f58529;stop-opacity:1" />
-                    <stop offset="25%" style="stop-color:#dd2a7b;stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:#8134af;stop-opacity:1" />
-                    <stop offset="75%" style="stop-color:#515bd4;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#405de6;stop-opacity:1" />
-                  </linearGradient>
-                </defs>
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-            </a>
-            <a class="social" href="https://youtube.com/@skvlog4848" aria-label="YouTube">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff0000">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-            </a>
           </div>
         </div>
       </div>

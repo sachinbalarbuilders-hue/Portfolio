@@ -4,6 +4,15 @@ const navToggle = document.querySelector('.nav-toggle');
 const navMenu = document.getElementById('navMenu');
 const links = document.querySelectorAll('.nav-link');
 
+// Fixed navbar scroll effect
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 50) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
+  }
+});
+
 navToggle?.addEventListener('click', () => {
   const expanded = navToggle.getAttribute('aria-expanded') === 'true';
   navToggle.setAttribute('aria-expanded', String(!expanded));
@@ -359,58 +368,22 @@ function handleContactForm() {
   const phoneInput = document.getElementById('phone');
   const messageInput = document.getElementById('message');
 
-  // Name validation
-  nameInput.addEventListener('blur', () => {
-    const name = nameInput.value.trim();
-    if (name.length === 0) {
-      nameInput.setCustomValidity('Name is required');
-      nameInput.reportValidity();
-    } else if (name.length > 30) {
-      nameInput.setCustomValidity('Name must be maximum 30 characters long');
-      nameInput.reportValidity();
-    } else {
-      nameInput.setCustomValidity('');
-    }
+  // Clear any existing validation messages on focus
+  nameInput.addEventListener('focus', () => {
+    nameInput.setCustomValidity('');
   });
 
-  // Phone validation
-  phoneInput.addEventListener('blur', () => {
-    const phone = phoneInput.value.trim();
-    if (phone.length === 0) {
-      phoneInput.setCustomValidity('Phone number is required');
-      phoneInput.reportValidity();
-    } else {
-      const phoneRegex = /^[0-9]{10}$/;
-      if (!phoneRegex.test(phone)) {
-        phoneInput.setCustomValidity('Please enter a valid 10-digit phone number');
-        phoneInput.reportValidity();
-      } else {
-        phoneInput.setCustomValidity('');
-      }
-    }
+  phoneInput.addEventListener('focus', () => {
+    phoneInput.setCustomValidity('');
   });
 
-  // Email validation
   const emailInput = document.getElementById('email');
-  emailInput.addEventListener('blur', () => {
-    const email = emailInput.value.trim();
-    if (email.length > 20) {
-      emailInput.setCustomValidity('Email must be maximum 20 characters long');
-      emailInput.reportValidity();
-    } else {
-      emailInput.setCustomValidity('');
-    }
+  emailInput.addEventListener('focus', () => {
+    emailInput.setCustomValidity('');
   });
 
-  // Message validation
-  messageInput.addEventListener('blur', () => {
-    const message = messageInput.value.trim();
-    if (message.length === 0) {
-      messageInput.setCustomValidity('Message is required');
-      messageInput.reportValidity();
-    } else {
-      messageInput.setCustomValidity('');
-    }
+  messageInput.addEventListener('focus', () => {
+    messageInput.setCustomValidity('');
   });
 
   contactForm.addEventListener('submit', async (e) => {
@@ -435,11 +408,19 @@ function handleContactForm() {
       isValid = false;
     }
     
-    // Check email
-    if (email.length > 20) {
+    // Check email (optional field)
+    if (email.length > 0 && email.length > 20) {
       emailInput.setCustomValidity('Email must be maximum 20 characters long');
       emailInput.reportValidity();
       isValid = false;
+    } else if (email.length > 0) {
+      // Basic email format validation if provided
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        emailInput.setCustomValidity('Please enter a valid email address');
+        emailInput.reportValidity();
+        isValid = false;
+      }
     }
     
     // Check phone - required and must be 10 digits
@@ -541,11 +522,26 @@ function initWorkSlider() {
     });
   });
   
-  // Show/hide arrows based on scroll position
+  // Show/hide arrows based on scroll position and content width
   function updateArrows() {
     const scrollLeft = workGrid.scrollLeft;
     const maxScroll = workGrid.scrollWidth - workGrid.clientWidth;
     
+    // Check if scrolling is needed
+    const needsScroll = workGrid.scrollWidth > workGrid.clientWidth;
+    
+    if (!needsScroll) {
+      // Hide both arrows if content fits without scrolling
+      leftBtn.style.display = 'none';
+      rightBtn.style.display = 'none';
+      return;
+    } else {
+      // Show arrows if scrolling is needed
+      leftBtn.style.display = 'flex';
+      rightBtn.style.display = 'flex';
+    }
+    
+    // Update arrow states based on scroll position
     if (scrollLeft > 0) {
       leftBtn.classList.remove('disabled');
     } else {
@@ -560,6 +556,12 @@ function initWorkSlider() {
   }
   
   workGrid.addEventListener('scroll', updateArrows);
+  
+  // Update arrows on window resize and when content loads
+  window.addEventListener('resize', updateArrows);
+  
+  // Check arrows after a delay to ensure videos are loaded
+  setTimeout(updateArrows, 500);
   updateArrows(); // Initial state
 }
 

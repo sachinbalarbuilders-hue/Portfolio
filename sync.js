@@ -357,24 +357,51 @@ class PortfolioSync {
     }
 
     updateTestimonials() {
-        if (!this.data.testimonials || this.data.testimonials.length === 0) return;
+        console.log('updateTestimonials called');
+        console.log('Testimonials data:', this.data.testimonials);
         
-        const testimonialsTrack = document.querySelector('.carousel-track');
-        if (!testimonialsTrack) return;
+        if (!this.data.testimonials || this.data.testimonials.length === 0) {
+            console.log('No testimonials data available');
+            return;
+        }
+        
+        const testimonialsTrack = document.querySelector('.testimonials-track');
+        console.log('Testimonials track element:', testimonialsTrack);
+        
+        if (!testimonialsTrack) {
+            console.error('Testimonials track element not found!');
+            return;
+        }
 
-        testimonialsTrack.innerHTML = this.data.testimonials.map(testimonial => `
-            <article class="testimonial">
-                <p>"${testimonial.text}"</p>
-                <div class="meta">
-                    <span class="name">${testimonial.name}</span>
-                    <span class="role">${testimonial.role}</span>
+        const testimonialHTML = this.data.testimonials.map(testimonial => {
+            const initial = testimonial.name.charAt(0).toUpperCase();
+            return `
+            <article class="testimonial-card">
+                <div class="quote-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+                        <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
+                    </svg>
                 </div>
-                <div class="stars" aria-label="${testimonial.rating} star rating">${'★'.repeat(testimonial.rating)}${'☆'.repeat(5-testimonial.rating)}</div>
+                <p class="testimonial-text">"${testimonial.text}"</p>
+                <div class="testimonial-footer">
+                    <div class="client-info">
+                        <div class="client-avatar">${initial}</div>
+                        <div>
+                            <div class="client-name">${testimonial.name}</div>
+                            <div class="client-role">${testimonial.role}</div>
+                        </div>
+                    </div>
+                    <div class="stars">${'★'.repeat(testimonial.rating)}${'☆'.repeat(5-testimonial.rating)}</div>
+                </div>
             </article>
-        `).join('');
+            `;
+        }).join('');
         
-        // Reinitialize carousel after updating testimonials
-        this.reinitializeCarousel();
+        // Duplicate testimonials for infinite scroll effect
+        testimonialsTrack.innerHTML = testimonialHTML + testimonialHTML;
+        
+        console.log('Testimonials updated successfully!');
     }
 
     reinitializeCarousel() {
@@ -450,14 +477,25 @@ class PortfolioSync {
         }
         
         const profileImg = document.querySelector('#about .portrait img');
-        if (profileImg && this.data.about.image) {
-            // Add cache buster to force image refresh
-            const imageUrl = this.data.about.image;
-            const cacheBuster = imageUrl.includes('?') ? '&' : '?';
-            profileImg.src = imageUrl + cacheBuster + 't=' + Date.now();
+        if (profileImg) {
+            if (this.data.about.image) {
+                // Add cache buster to force image refresh
+                const imageUrl = this.data.about.image;
+                const cacheBuster = imageUrl.includes('?') ? '&' : '?';
+                profileImg.src = imageUrl + cacheBuster + 't=' + Date.now();
+                profileImg.style.opacity = '1';
+            } else {
+                // Use a default placeholder SVG if no image is set
+                profileImg.src = 'data:image/svg+xml;base64,' + btoa(`
+                    <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#1a1a2e"/>
+                        <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="#8b5cf6" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Profile Image</text>
+                    </svg>
+                `);
+            }
         }
         
-        const resumeLink = document.querySelector('#about .btn-primary[download]');
+        const resumeLink = document.querySelector('.resume-download-icon');
         if (resumeLink && this.data.about.resume) {
             resumeLink.href = this.data.about.resume;
         }
@@ -466,25 +504,23 @@ class PortfolioSync {
     updateContact() {
         if (!this.data.contact) return;
         
-        const emailLink = document.querySelector('a[href^="mailto:"]');
+        // Update email link in contact info
+        const emailLink = document.querySelector('.contact-text a[href^="mailto:"]');
         if (emailLink && this.data.contact.email) {
             emailLink.href = `mailto:${this.data.contact.email}`;
             emailLink.textContent = this.data.contact.email;
         }
         
-        const whatsappLink = document.querySelector('a[href*="wa.me"]');
-        if (whatsappLink && this.data.contact.whatsapp) {
-            whatsappLink.href = `https://wa.me/${this.data.contact.whatsapp}`;
-        }
-        
-        const instagramLink = document.querySelector('a[href*="instagram.com"]');
+        // Update Instagram link
+        const instagramLink = document.querySelector('.social[href*="instagram.com"]');
         if (instagramLink && this.data.contact.instagram) {
             // Remove @ symbol if present and format as proper Instagram URL
             const handle = this.data.contact.instagram.replace('@', '');
             instagramLink.href = `https://www.instagram.com/${handle}/`;
         }
         
-        const youtubeLink = document.querySelector('a[href*="youtube.com"]');
+        // Update YouTube link
+        const youtubeLink = document.querySelector('.social[href*="youtube.com"]');
         if (youtubeLink && this.data.contact.youtube) {
             youtubeLink.href = this.data.contact.youtube;
         }
