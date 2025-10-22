@@ -647,7 +647,7 @@ function initWorkAutoRotate() {
     // Detect mobile and adjust scroll amount
     const isMobile = window.innerWidth <= 768;
     const scrollAmount = isMobile ? window.innerWidth - 20 : 520; // Mobile: full width, Desktop: card width
-    const rotationSpeed = 4000; // 4 seconds
+    const rotationSpeed = 1500; // 1.5 seconds - very fast rotation
     
     rotationInterval = setInterval(() => {
       if (!isAutoRotating) return;
@@ -695,13 +695,13 @@ function initWorkAutoRotate() {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
       startAutoRotation();
-    }, 3000);
+    }, 2000); // Reduced pause time from 3s to 2s
   });
   
   // Start rotation after a delay
   setTimeout(() => {
     startAutoRotation();
-  }, 3000);
+  }, 2000); // Reduced delay from 3s to 2s
 }
 
 // Cursor-follow glow
