@@ -297,31 +297,72 @@ function typeText(element, text, index) {
 // Services scroll animation
 function initServicesAnimation() {
   const serviceCards = document.querySelectorAll('.service-card');
+  const animationStates = new Map(); // Track animation states
   
+  // Enhanced animation with reverse scrolling support
   const servicesObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    entries.forEach((entry, index) => {
+      const card = entry.target;
+      const cardId = card.getAttribute('data-card-id') || Math.random().toString(36);
+      
+      if (!card.getAttribute('data-card-id')) {
+        card.setAttribute('data-card-id', cardId);
+      }
+      
       if (entry.isIntersecting) {
-        // Reset animation state
-        entry.target.classList.remove('animate');
-        
-        // Force reflow to ensure reset is applied
-        entry.target.offsetHeight;
-        
-        // Add a small delay to make it feel more natural
-        setTimeout(() => {
-          entry.target.classList.add('animate');
-        }, 100);
+        // Animate in
+        if (!animationStates.get(cardId) || animationStates.get(cardId) === 'hidden') {
+          animationStates.set(cardId, 'animating');
+          
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.filter = 'blur(0px)';
+            card.style.boxShadow = '0 20px 40px rgba(139,92,246,0.15)';
+            animationStates.set(cardId, 'visible');
+          }, index * 150);
+        }
       } else {
-        // Reset when leaving viewport
-        entry.target.classList.remove('animate');
+        // Animate out (reverse scrolling)
+        if (animationStates.get(cardId) === 'visible') {
+          animationStates.set(cardId, 'animating');
+          
+          setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px) scale(0.9)';
+            card.style.filter = 'blur(5px)';
+            card.style.boxShadow = '0 0 0 rgba(139,92,246,0)';
+            animationStates.set(cardId, 'hidden');
+          }, index * 100);
+        }
       }
     });
   }, {
-    threshold: 0.2,
-    rootMargin: '0px 0px -100px 0px'
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
   });
 
-  serviceCards.forEach(card => {
+  serviceCards.forEach((card, index) => {
+    // Set initial state with more dramatic effect
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(50px) scale(0.9)';
+    card.style.filter = 'blur(5px)';
+    card.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.8s ease, box-shadow 0.8s ease';
+    card.style.boxShadow = '0 0 0 rgba(139,92,246,0)';
+    
+    // Check if card is already in viewport
+    const rect = card.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      // Card is already visible, show it with animation
+      setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0) scale(1)';
+        card.style.filter = 'blur(0px)';
+        card.style.boxShadow = '0 20px 40px rgba(139,92,246,0.15)';
+        animationStates.set(card.getAttribute('data-card-id'), 'visible');
+      }, index * 100);
+    }
+    
     servicesObserver.observe(card);
   });
 }

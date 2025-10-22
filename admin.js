@@ -424,7 +424,7 @@ class PortfolioAdmin {
             <div class="content-card">
                 <div class="video-preview">
                         <img src="${thumbnailSrc}" alt="${video.title}" onerror="this.src='data:image/svg+xml;base64,${btoa('<svg width="400" height="225" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#333"/><text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="white" font-family="Arial" font-size="16">Thumbnail Error</text></svg>')}'">
-                        <div class="platform-badge">${platformIcon} ${video.platform || 'youtube'}</div>
+                        <!-- Platform badge removed -->
                 </div>
                 <h3>${video.title}</h3>
                 <p>${video.description}</p>
@@ -487,14 +487,32 @@ class PortfolioAdmin {
             return { platform: 'youtube', id: url, url: `https://www.youtube.com/watch?v=${url}` };
         }
         
-        // Check for Google Drive
-        if (url.includes('drive.google.com/file/d/')) {
-            const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
-            if (match && match[1]) {
+        // Check for Google Drive - handle multiple URL formats
+        if (url.includes('drive.google.com')) {
+            let fileId = null;
+            
+            // Format 1: https://drive.google.com/file/d/FILE_ID/view
+            if (url.includes('/file/d/')) {
+                const match = url.match(/\/file\/d\/([^\/\?]+)/);
+                fileId = match ? match[1] : null;
+            }
+            // Format 2: https://drive.google.com/open?id=FILE_ID
+            else if (url.includes('id=')) {
+                const match = url.match(/id=([^&]+)/);
+                fileId = match ? match[1] : null;
+            }
+            // Format 3: https://drive.google.com/file/d/FILE_ID/edit
+            else if (url.includes('/file/d/')) {
+                const match = url.match(/\/file\/d\/([^\/\?]+)/);
+                fileId = match ? match[1] : null;
+            }
+            
+            if (fileId) {
+                console.log('Google Drive detected:', { platform: 'googledrive', id: fileId, url });
                 return { 
                     platform: 'googledrive', 
                     type: 'video',
-                    id: match[1], 
+                    id: fileId, 
                     url: url 
                 };
             }

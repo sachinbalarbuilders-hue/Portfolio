@@ -1,4 +1,4 @@
-// Portfolio Data Sync Script
+// Portfolio Data Sync Script - v2.0 - Platform badges removed
 // This script helps sync admin panel data with the main website
 
 class PortfolioSync {
@@ -26,7 +26,6 @@ class PortfolioSync {
             // Update all sections
             this.updateVideos();
             this.updateTestimonials();
-            this.updateServices();
             this.updateAbout();
             this.updateContact();
             
@@ -106,37 +105,37 @@ class PortfolioSync {
                 // Instagram doesn't provide reliable public thumbnails, use placeholder
                 thumbnailUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtIFJlZWw8L3RleHQ+Cjwvc3ZnPg==';
                 platformIcon = '📱';
-                platformBadge = 'Instagram Reel';
+                platformBadge = ''; // No badge
             } else if (isGoogleDrive) {
-                // Use Google Drive thumbnail with multiple fallback options
-                thumbnailUrl = `https://drive.google.com/thumbnail?id=${video.id}&sz=w400-h225`;
-                platformIcon = '☁️';
-                platformBadge = 'Google Drive';
+                // Use default Instagram-style thumbnail for Google Drive videos
+                thumbnailUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtPC90ZXh0Pgo8L3N2Zz4=';
+                platformIcon = '📱';
+                platformBadge = ''; // No badge
             } else if (isVimeo) {
                 // Use Vimeo thumbnail API
                 thumbnailUrl = `https://vumbnail.com/${video.id}.jpg`;
                 platformIcon = '🎬';
-                platformBadge = 'Vimeo Video';
+                platformBadge = ''; // No badge
             } else if (isYouTubeShort) {
                 thumbnailUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
                 platformIcon = '🎬';
-                platformBadge = 'YouTube Short';
+                platformBadge = ''; // No badge
             } else {
                 thumbnailUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
                 platformIcon = '🎥';
-                platformBadge = 'YouTube Video';
+                platformBadge = ''; // No badge
             }
             
             return `
             <article class="work-item" data-video="${video.id}" data-platform="${video.platform}" data-type="${video.type || 'video'}" data-url="${video.url}" data-title="${video.title}" data-desc="${video.description}">
                 <div class="thumb">
-                    <img src="${thumbnailUrl}" alt="${video.title} thumbnail" ${!isInstagram ? `onerror="this.src='${isGoogleDrive ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjNDI4NWY0Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+R29vZ2xlIERyaXZlPC90ZXh0Pgo8L3N2Zz4=' : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtIFJlZWw8L3RleHQ+Cjwvc3ZnPg=='}"` : ''} />
+                    <img src="${thumbnailUrl}" alt="${video.title} thumbnail" ${!isInstagram && !isGoogleDrive ? `onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTEyLjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW5zdGFncmFtIFJlZWw8L3RleHQ+Cjwvc3ZnPg=='"` : ''} />
                     <button class="play-btn" aria-label="Play ${video.title}">${platformIcon}</button>
                 </div>
                 <div class="work-meta">
                     <h3>${video.title}</h3>
                     <p>${video.description}</p>
-                    <div class="platform-badge">${platformBadge}</div>
+                    <!-- Platform badge removed -->
                 </div>
             </article>
         `;
@@ -487,18 +486,8 @@ class PortfolioSync {
     }
 
     updateServices() {
-        if (!this.data.services || this.data.services.length === 0) return;
-        
-        const servicesGrid = document.querySelector('.services-grid');
-        if (!servicesGrid) return;
-
-        servicesGrid.innerHTML = this.data.services.map(service => `
-            <div class="service-card">
-                <div class="service-icon">${service.icon}</div>
-                <h3>${service.title}</h3>
-                <p>${service.description}</p>
-            </div>
-        `).join('');
+        // Services are hardcoded in HTML, no need to update
+        console.log('Services are hardcoded in HTML, keeping default services');
     }
 
     updateAbout() {
@@ -511,20 +500,44 @@ class PortfolioSync {
         
         const profileImg = document.querySelector('#about .portrait img');
         if (profileImg) {
-            if (this.data.about.image) {
+            if (this.data.about.image && this.data.about.image.trim() !== '') {
                 // Add cache buster to force image refresh
                 const imageUrl = this.data.about.image;
                 const cacheBuster = imageUrl.includes('?') ? '&' : '?';
                 profileImg.src = imageUrl + cacheBuster + 't=' + Date.now();
                 profileImg.style.opacity = '1';
+                profileImg.style.display = 'block';
+                
+                // Handle image load error - hide container if image fails to load
+                profileImg.onerror = () => {
+                    const portraitContainer = document.querySelector('#about .portrait');
+                    if (portraitContainer) {
+                        portraitContainer.style.display = 'none';
+                        portraitContainer.style.visibility = 'hidden';
+                        portraitContainer.style.opacity = '0';
+                    }
+                    profileImg.style.display = 'none';
+                };
+                
+                // Handle successful image load
+                profileImg.onload = () => {
+                    const portraitContainer = document.querySelector('#about .portrait');
+                    if (portraitContainer) {
+                        portraitContainer.style.display = 'block';
+                        portraitContainer.style.visibility = 'visible';
+                        portraitContainer.style.opacity = '1';
+                    }
+                    profileImg.style.display = 'block';
+                };
             } else {
-                // Use a default placeholder SVG if no image is set
-                profileImg.src = 'data:image/svg+xml;base64,' + btoa(`
-                    <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100%" height="100%" fill="#1a1a2e"/>
-                        <text x="50%" y="50%" text-anchor="middle" dy="0.3em" fill="#8b5cf6" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Profile Image</text>
-                    </svg>
-                `);
+                // Hide the entire portrait container when no image is provided
+                const portraitContainer = document.querySelector('#about .portrait');
+                if (portraitContainer) {
+                    portraitContainer.style.display = 'none';
+                    portraitContainer.style.visibility = 'hidden';
+                    portraitContainer.style.opacity = '0';
+                }
+                profileImg.style.display = 'none';
             }
         }
         
