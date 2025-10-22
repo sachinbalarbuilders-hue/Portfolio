@@ -357,19 +357,16 @@ class PortfolioSync {
     }
 
     updateTestimonials() {
-        console.log('updateTestimonials called');
-        console.log('Testimonials data:', this.data.testimonials);
-        
         if (!this.data.testimonials || this.data.testimonials.length === 0) {
-            console.log('No testimonials data available');
+            const testimonialsTrack = document.querySelector('.testimonials-track');
+            if (testimonialsTrack) {
+                testimonialsTrack.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--muted);">No testimonials available yet.</div>';
+            }
             return;
         }
         
         const testimonialsTrack = document.querySelector('.testimonials-track');
-        console.log('Testimonials track element:', testimonialsTrack);
-        
         if (!testimonialsTrack) {
-            console.error('Testimonials track element not found!');
             return;
         }
 
@@ -401,7 +398,43 @@ class PortfolioSync {
         // Duplicate testimonials for infinite scroll effect
         testimonialsTrack.innerHTML = testimonialHTML + testimonialHTML;
         
-        console.log('Testimonials updated successfully!');
+        // Initialize smooth infinite scroll
+        this.initInfiniteScroll();
+    }
+
+    initInfiniteScroll() {
+        const track = document.querySelector('.testimonials-track');
+        if (!track) return;
+
+        // Remove CSS animation
+        track.style.animation = 'none';
+        
+        let position = 0;
+        const speed = 1.2; // pixels per frame
+        const totalWidth = track.scrollWidth / 2; // Half because we duplicated
+        
+        const animate = () => {
+            position -= speed;
+            
+            // Reset position when we've scrolled through half the content
+            if (position <= -totalWidth) {
+                position = 0;
+            }
+            
+            track.style.transform = `translateX(${position}px)`;
+            requestAnimationFrame(animate);
+        };
+        
+        // Pause on hover
+        track.addEventListener('mouseenter', () => {
+            track.style.animationPlayState = 'paused';
+        });
+        
+        track.addEventListener('mouseleave', () => {
+            track.style.animationPlayState = 'running';
+        });
+        
+        animate();
     }
 
     reinitializeCarousel() {
