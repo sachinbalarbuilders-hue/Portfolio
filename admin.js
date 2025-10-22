@@ -6,7 +6,7 @@ class PortfolioAdmin {
         this.currentEditingId = null;
         this.isAuthenticated = this.checkAuthentication();
         this.adminPassword = 'adminsonu';
-        this.init().catch(console.error);
+        this.init().catch(() => {});
     }
 
     async init() {
@@ -164,7 +164,6 @@ class PortfolioAdmin {
         try {
             this.data = await this.api.getData();
         } catch (error) {
-            console.error('Error loading data:', error);
             // Fallback to empty data structure
             this.data = {
             videos: [],
@@ -365,7 +364,6 @@ class PortfolioAdmin {
                         alert('No submissions found');
                     }
                 } else {
-                    console.error('Submissions section not found!');
                 }
             }, 100);
         }
@@ -448,7 +446,6 @@ class PortfolioAdmin {
     editVideo(videoId) {
         const video = this.data.videos.find(v => v.id === videoId);
         if (!video) {
-            console.error('Video not found:', videoId);
             return;
         }
 
@@ -508,7 +505,6 @@ class PortfolioAdmin {
             }
             
             if (fileId) {
-                console.log('Google Drive detected:', { platform: 'googledrive', id: fileId, url });
                 return { 
                     platform: 'googledrive', 
                     type: 'video',
@@ -801,7 +797,6 @@ class PortfolioAdmin {
             </div>
         `).join('');
         } catch (error) {
-            console.error('Error loading submissions:', error);
             const submissionsList = document.getElementById('submissionsList');
             if (submissionsList) {
                 submissionsList.innerHTML = '<div class="no-submissions"><p>Error loading submissions</p></div>';
@@ -816,7 +811,6 @@ class PortfolioAdmin {
             await this.saveData();
             this.loadSubmissions();
         } else {
-            console.error('Submission not found:', submissionId);
         }
     }
 
@@ -840,7 +834,6 @@ class PortfolioAdmin {
                 localStorage.removeItem('contactSubmissions');
             }
         } catch (error) {
-            console.error('Error migrating submissions:', error);
         }
     }
 
@@ -876,7 +869,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
     admin = new PortfolioAdmin();
     } catch (error) {
-        console.error('Error initializing admin panel:', error);
         document.body.innerHTML = '<div style="padding: 20px; color: red;">Error loading admin panel: ' + error.message + '</div>';
     }
 });

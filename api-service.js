@@ -23,7 +23,6 @@ class PortfolioAPI {
             const data = await response.json();
             return data.record;
         } catch (error) {
-            console.error('Error fetching data:', error);
             return this.getLocalData();
         }
     }
@@ -46,7 +45,6 @@ class PortfolioAPI {
             localStorage.setItem('portfolioData', JSON.stringify(data));
             return true;
         } catch (error) {
-            console.error('Error saving data:', error);
             localStorage.setItem('portfolioData', JSON.stringify(data));
             return false;
         }

@@ -121,18 +121,18 @@ function handleSkillsScroll() {
   const aboutSection = document.getElementById('about');
   if (!aboutSection) return;
   
-  const rect = aboutSection.getBoundingClientRect();
+    const rect = aboutSection.getBoundingClientRect();
   const viewportHeight = window.innerHeight;
   
   // More mobile-friendly viewport detection
   const isInView = rect.top < viewportHeight * 0.7 && rect.bottom > viewportHeight * 0.3;
-  
-  if (isInView && !skillBarsAnimated) {
-    animateSkillBars();
-  } else if (!isInView && skillBarsAnimated) {
-    resetSkillBars();
+    
+    if (isInView && !skillBarsAnimated) {
+      animateSkillBars();
+    } else if (!isInView && skillBarsAnimated) {
+      resetSkillBars();
+    }
   }
-}
 
 // Debounced scroll handler
 window.addEventListener('scroll', () => {
@@ -401,7 +401,7 @@ function initStatsAnimation() {
 
 // Contact form submission with validation
 function handleContactForm() {
-  const contactForm = document.getElementById('contactForm');
+const contactForm = document.getElementById('contactForm');
   if (!contactForm) return;
 
   // Add real-time validation
@@ -428,7 +428,7 @@ function handleContactForm() {
   });
 
   contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
     
     // Validate all required fields
     const name = nameInput.value.trim();
@@ -533,7 +533,6 @@ function handleContactForm() {
       }, 3000);
 
     } catch (error) {
-      console.error('Error saving contact submission:', error);
       alert('There was an error sending your message. Please try again.');
     }
   });
@@ -547,7 +546,9 @@ function initWorkSlider() {
   
   if (!workGrid || !leftBtn || !rightBtn) return;
   
-  const scrollAmount = 320; // Scroll by one card width + gap
+  // Detect mobile and adjust scroll amount
+  const isMobile = window.innerWidth <= 768;
+  const scrollAmount = isMobile ? window.innerWidth - 20 : 520; // Mobile: full width, Desktop: card width
   
   leftBtn.addEventListener('click', () => {
     workGrid.scrollBy({
@@ -613,7 +614,95 @@ document.addEventListener('DOMContentLoaded', () => {
   initStatsAnimation(); // Initialize stats animation
   handleContactForm(); // Initialize contact form
   initWorkSlider(); // Initialize work slider navigation
+  initWorkAutoRotate(); // Initialize auto-rotating carousel
 });
+
+// Auto-rotating work carousel (Netflix/Amazon style)
+function initWorkAutoRotate() {
+  
+  const workGrid = document.querySelector('.work-grid');
+  if (!workGrid) {
+    return;
+  }
+  
+  let rotationInterval;
+  let isAutoRotating = false;
+  
+  function startAutoRotation() {
+    
+    const workItems = document.querySelectorAll('.work-item');
+    
+    if (workItems.length <= 1) {
+      return;
+    }
+    
+    // Check if content is scrollable
+    const isScrollable = workGrid.scrollWidth > workGrid.clientWidth;
+    if (!isScrollable) {
+    return;
+  }
+    
+    isAutoRotating = true;
+    let currentPosition = 0;
+    // Detect mobile and adjust scroll amount
+    const isMobile = window.innerWidth <= 768;
+    const scrollAmount = isMobile ? window.innerWidth - 20 : 520; // Mobile: full width, Desktop: card width
+    const rotationSpeed = 4000; // 4 seconds
+    
+    rotationInterval = setInterval(() => {
+      if (!isAutoRotating) return;
+      
+      
+      currentPosition += scrollAmount;
+      const maxScroll = workGrid.scrollWidth - workGrid.clientWidth;
+      
+      if (currentPosition >= maxScroll) {
+        // Reset to beginning
+        currentPosition = 0;
+        workGrid.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      } else {
+        workGrid.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }, rotationSpeed);
+  }
+  
+  function stopAutoRotation() {
+    isAutoRotating = false;
+    if (rotationInterval) {
+      clearInterval(rotationInterval);
+      rotationInterval = null;
+    }
+  }
+  
+  // Pause on hover
+  workGrid.addEventListener('mouseenter', stopAutoRotation);
+  workGrid.addEventListener('mouseleave', () => {
+    if (!rotationInterval) {
+      startAutoRotation();
+    }
+  });
+  
+  // Pause on manual scroll
+  let scrollTimeout;
+  workGrid.addEventListener('scroll', () => {
+    stopAutoRotation();
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      startAutoRotation();
+    }, 3000);
+  });
+  
+  // Start rotation after a delay
+  setTimeout(() => {
+    startAutoRotation();
+  }, 3000);
+}
 
 // Cursor-follow glow
 const glow = document.querySelector('.cursor-glow');
