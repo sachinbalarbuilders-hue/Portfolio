@@ -24,6 +24,7 @@ const allNavigationLinks = document.querySelectorAll('a[href^="#"]');
 allNavigationLinks.forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Close mobile menu if it's open
     if (navMenu) {
@@ -49,6 +50,28 @@ allNavigationLinks.forEach(link => {
       });
     }
   });
+});
+
+// Additional specific handler for hero buttons to ensure they work identically
+document.addEventListener('DOMContentLoaded', () => {
+  const watchWorkBtn = document.querySelector('a[href="#work"]');
+  if (watchWorkBtn) {
+    watchWorkBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const workSection = document.getElementById('work');
+      if (workSection) {
+        const headerHeight = 100;
+        const targetPosition = workSection.offsetTop - headerHeight;
+        
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }
 });
 
 // Active section observer
