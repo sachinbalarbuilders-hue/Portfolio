@@ -19,13 +19,19 @@ navToggle?.addEventListener('click', () => {
   navMenu.classList.toggle('show');
 });
 
-links.forEach(link => {
+// Handle navigation for both navbar links and hero buttons
+const allNavigationLinks = document.querySelectorAll('a[href^="#"]');
+allNavigationLinks.forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
     
-    // Close mobile menu
-    navMenu.classList.remove('show');
-    navToggle?.setAttribute('aria-expanded', 'false');
+    // Close mobile menu if it's open
+    if (navMenu) {
+      navMenu.classList.remove('show');
+    }
+    if (navToggle) {
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
     
     // Get target section
     const targetId = link.getAttribute('href')?.replace('#', '');
