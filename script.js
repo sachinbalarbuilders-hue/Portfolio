@@ -40,7 +40,13 @@ allNavigationLinks.forEach(link => {
     
     if (targetSection) {
       // Calculate offset to account for fixed header
-      const headerHeight = 65; // Set to 65px as requested
+      let headerHeight = 65; // Default offset
+      
+      // Special offset for services section
+      if (targetId === 'services') {
+        headerHeight = 10; // Services section uses 10px offset
+      }
+      
       const targetPosition = targetSection.offsetTop - headerHeight;
       
       // Simple scrolling for all sections
