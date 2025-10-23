@@ -211,7 +211,7 @@ a { color: var(--text); text-decoration: none; }
   }
   
   .contact .section-title {
-    margin-bottom: 40px !important;
+    margin-bottom: 20px !important; /* Reduced spacing for mobile */
   }
   
   .portrait-stats {
@@ -1133,7 +1133,7 @@ a { color: var(--text); text-decoration: none; }
 
 /* Add extra space after contact section title */
 .contact .section-title {
-  margin-bottom: 40px; /* Match other section titles */
+  margin-bottom: 20px; /* Reduced spacing between title and content */
 }
 
 .testimonials-grid {
