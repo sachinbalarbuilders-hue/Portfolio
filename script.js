@@ -40,10 +40,10 @@ allNavigationLinks.forEach(link => {
     
     if (targetSection) {
       // Calculate offset to account for fixed header
-      const headerHeight = 100; // Further increased to ensure hero section is completely hidden
+      const headerHeight = 65; // Set to 65px as requested
       const targetPosition = targetSection.offsetTop - headerHeight;
       
-      // Smooth scroll to section with proper offset
+      // Simple scrolling for all sections
       window.scrollTo({
         top: targetPosition,
         behavior: 'smooth'
@@ -52,27 +52,6 @@ allNavigationLinks.forEach(link => {
   });
 });
 
-// Additional specific handler for hero buttons to ensure they work identically
-document.addEventListener('DOMContentLoaded', () => {
-  const watchWorkBtn = document.querySelector('a[href="#work"]');
-  if (watchWorkBtn) {
-    watchWorkBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const workSection = document.getElementById('work');
-      if (workSection) {
-        const headerHeight = 100;
-        const targetPosition = workSection.offsetTop - headerHeight;
-        
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      }
-    });
-  }
-});
 
 // Active section observer
 const sectionIds = ['hero','work','about','services','testimonials','contact'];
