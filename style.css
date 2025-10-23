@@ -1390,7 +1390,7 @@ a { color: var(--text); text-decoration: none; }
 }
 
 .contact-intro {
-  margin-bottom: 32px;
+  margin-bottom: 15px; /* Reduced to bring content closer to title */
   text-align: center; /* Center the intro text */
 }
 
