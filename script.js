@@ -39,7 +39,7 @@ allNavigationLinks.forEach(link => {
     
     if (targetSection) {
       // Calculate offset to account for fixed header
-      const headerHeight = 80; // Increased to ensure hero section is completely hidden
+      const headerHeight = 100; // Further increased to ensure hero section is completely hidden
       const targetPosition = targetSection.offsetTop - headerHeight;
       
       // Smooth scroll to section with proper offset
