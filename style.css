@@ -201,6 +201,19 @@ a { color: var(--text); text-decoration: none; }
   .hero { min-height: 100vh; }
   .work { min-height: 70vh; }
   
+  /* Ensure consistent section title spacing on mobile */
+  .section-title {
+    margin: 0 0 40px !important;
+  }
+  
+  .services .section-title {
+    margin-bottom: 40px !important;
+  }
+  
+  .contact .section-title {
+    margin-bottom: 40px !important;
+  }
+  
   .portrait-stats {
     grid-template-columns: 1fr;
     gap: 8px;
