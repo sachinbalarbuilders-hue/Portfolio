@@ -211,7 +211,7 @@ a { color: var(--text); text-decoration: none; }
   }
   
   .contact .section-title {
-    margin-bottom: 15px !important; /* Reduced spacing for mobile */
+    margin-bottom: 40px !important;
   }
   
   .portrait-stats {
