@@ -513,8 +513,8 @@ const contactForm = document.getElementById('contactForm');
     }
     
     // Check email (optional field)
-    if (email.length > 0 && email.length > 20) {
-      emailInput.setCustomValidity('Email must be maximum 20 characters long');
+    if (email.length > 0 && email.length > 50) {
+      emailInput.setCustomValidity('Email must be maximum 50 characters long');
       emailInput.reportValidity();
       isValid = false;
     } else if (email.length > 0) {
